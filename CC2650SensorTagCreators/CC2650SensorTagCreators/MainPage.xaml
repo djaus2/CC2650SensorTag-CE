@@ -15,10 +15,21 @@
             <RowDefinition/>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Button Width="100" Height="100" Content="Start Watcher" Tapped="Button_Tapped" Grid.Row="0"/>
-        <Button Width="100" Height="100" Content="Stop Watcher" Tapped="Button_Tapped_1"  Grid.Row="1"/>
-        <Button Width="100" Height="100" Content="Start Logging" Tapped="Button_Tapped_2"  Grid.Row="3"/>
-        <Button Width="100" Height="100" Content="Stop Logging" Tapped="Button_Tapped_3"  Grid.Row="4"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="120" />
+            <ColumnDefinition Width="*" />
+
+        </Grid.ColumnDefinitions>
+        <Button Width="100" Height="100" Content="Start Watcher" Tapped="Button_Tapped" Grid.Column="0" Grid.Row="0"/>
+        <Button Width="100" Height="100" Content="Stop Watcher" Tapped="Button_Tapped_1"  Grid.Column="0" Grid.Row="1"/>
+
+        <Button Width="100" Height="100" Content="Start Logging" Tapped="Button_Tapped_2"  Grid.Column="0" Grid.Row="3"/>
+        <Button Width="100" Height="100" Content="Stop Logging" Tapped="Button_Tapped_3"  Grid.Column="0" Grid.Row="4"/>
+        <TextBox x:Name="TxtOutput" Grid.Column="1" Grid.Row="0" Grid.RowSpan="5" 
+                   TextWrapping="NoWrap"
+  AcceptsReturn="True"
+  ScrollViewer.VerticalScrollBarVisibility="Visible"
+                 />
 
     </Grid>
 </Page>

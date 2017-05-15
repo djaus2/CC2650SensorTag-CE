@@ -9,22 +9,37 @@ namespace CC2650SenorTagCreators
 {
     public class SensorData
     {
-        public SensorUUIDs.SensorIndexes Sensor_Index;
+        public CC2650SensorTag.SensorIndexes Sensor_Index;
         public double[] Values;
         public byte[] Raw;
 
 
     }
 
-    public class Sensor
-    {
-        public SensorUUIDs.SensorIndexes Sensor_Index;
-        public Dictionary<SensorUUIDs.CharacteristicTypes, GattCharacteristic> Charcteristics;
+    public enum CharacteristicsTypes { sensor, property}
 
-        public Sensor(SensorUUIDs.SensorIndexes Sensor)
+    public class SensorChars
+    {
+        public CC2650SensorTag.SensorIndexes Sensor_Index;
+        public CC2650SensorTag.SensorTagProperties Property_Index;
+        public Dictionary<CC2650SensorTag.CharacteristicTypes, GattCharacteristic> Charcteristics;
+        public CharacteristicsTypes Type;
+
+        public SensorChars(CC2650SensorTag.SensorIndexes Sensor )
         {
             Sensor_Index = Sensor;
-            Charcteristics = new Dictionary<SensorUUIDs.CharacteristicTypes, GattCharacteristic>();
+            Type = CharacteristicsTypes.sensor;
+            Charcteristics = new Dictionary<CC2650SensorTag.CharacteristicTypes, GattCharacteristic>();
         }
+
+        public SensorChars(CC2650SensorTag.SensorTagProperties Property)
+        {
+            Property_Index = Property;
+            Type = CharacteristicsTypes.property;
+            Charcteristics = new Dictionary<CC2650SensorTag.CharacteristicTypes, GattCharacteristic>();
+        }
+
     }
+
+
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CC2650SenorTagCreators
 {
-    public static partial class SensorUUIDs
+    public sealed partial class CC2650SensorTag
     {
         internal const int SENSOR_MAX = (int)SensorIndexes.REGISTERS;
         public static int NUM_SENSORS { get; set; } = SENSOR_MAX;
@@ -87,7 +87,7 @@ namespace CC2650SenorTagCreators
         /// Generate UUIDsSensorsTable from SensorsUUIDsTable
         /// Swap keys with values
         /// </summary>
-        public static void InitUUIDs3()
+        public static void InitSensorIndexUUIDs()
         {
             UUIDsSensorsTable  =  new Dictionary<string, SensorIndexes>();
             foreach (var x in SensorsUUIDsTable)
@@ -104,13 +104,25 @@ namespace CC2650SenorTagCreators
         internal static SensorIndexes GetSensor(string uuid)
         {
             if (UUIDsSensorsTable ==null)
-                InitUUIDs3();
+                InitSensorIndexUUIDs();
             SensorIndexes sensor = SensorIndexes.NOTFOUND;
             if (UUIDsSensorsTable .Keys.Contains(uuid.ToUpper()))
             {
                 sensor = UUIDsSensorsTable [uuid.ToUpper()];
             }
             return sensor;
+        }
+
+        internal static SensorTagProperties GetProperty(string uuid)
+        {
+            if (UUIDsPropertyTable == null)
+                InitPropertyUUIds();
+            SensorTagProperties property = SensorTagProperties.NOTFOUND;
+            if (UUIDsPropertyTable.Keys.Contains(uuid.ToUpper()))
+            {
+                property = UUIDsPropertyTable[uuid.ToUpper()];
+            }
+            return property;
         }
 
 
@@ -126,10 +138,11 @@ namespace CC2650SenorTagCreators
         public static void Init()
         {
             if (UUIDsSensorsTable  == null)
-                InitUUIDs3();
-            InitUUIDs3();
+                InitSensorIndexUUIDs();
+            if(UUIDsPropertyTable==null)
+                InitPropertyUUIds();
 
-            
+
 
             Characters = new Dictionary<string, Tuple<SensorIndexes, CharacteristicTypes>>();
             Dictionary<CharacteristicTypes, string> Masks;
@@ -171,11 +184,11 @@ namespace CC2650SenorTagCreators
         /// <summary>
         /// Use the lookup table
         /// </summary>
-        internal static  CharacteristicTypes GetCharacteristicType(string uuid)
+        internal static  CharacteristicTypes GetSensorCharacteristicType(string uuid)
         {
             if (Characters == null)
                 Init();
-            CharacteristicTypes res = CharacteristicTypes.None;
+            CharacteristicTypes res = CharacteristicTypes.NOTFOUND;
             if (Characters.Keys.Contains(uuid.ToUpper()))
             {
                 var rt = Characters[uuid.ToUpper()];
@@ -185,9 +198,19 @@ namespace CC2650SenorTagCreators
             return res;
         }
 
+        internal static SensorTagProperties GetPropertyCharacteristicType(string uuid)
+        {
+            if (UUIDsPropertyTable == null)
+                InitPropertyUUIds();
+            SensorTagProperties res = SensorTagProperties.NOTFOUND;
+            if (UUIDsPropertyTable.Keys.Contains(uuid.ToUpper()))
+                res = UUIDsPropertyTable[uuid.ToUpper()];
+            return res;
+        }
+
         //The characteristics types
         public enum CharacteristicTypes
-        { Base, Data, Notify, Enable, Period, Configuration, Registers_Address, Registers_Device_Id, None };
+        { Base, Data, Notify, Enable, Period, Configuration, Registers_Address, Registers_Device_Id, NOTFOUND };
 
         private static readonly Dictionary<CharacteristicTypes, string> MasksSensors
         = new Dictionary<CharacteristicTypes, string>()

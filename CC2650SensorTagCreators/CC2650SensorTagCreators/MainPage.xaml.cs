@@ -9,7 +9,9 @@ using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.Storage.Streams;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -38,7 +40,9 @@ namespace CC2650SenorTagCreators
         public MainPage()
         {
             this.InitializeComponent();
-            SensorUUIDs.Init();
+            CC2650SensorTag.Init();
+
+            MP = this;
         }
 
         public void Start()
@@ -58,9 +62,11 @@ namespace CC2650SenorTagCreators
 
 
         long barrier = 0;
-        SensorUUIDs.TagSensorServices TagServices;
+        CC2650SensorTag.TagSensorServices TagServices;
         private async void Bleaw_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
+            if (sender == null)
+                return;
             bool OK = false;
             if (System.Threading.Interlocked.Increment(ref barrier) == 1)
             {
@@ -69,35 +75,39 @@ namespace CC2650SenorTagCreators
                 ulong blAdress = args.BluetoothAddress; ;
                 BluetoothLEDevice blDevice = await
                     Windows.Devices.Bluetooth.BluetoothLEDevice.FromBluetoothAddressAsync(blAdress);
-                var name = blDevice.Name;
-                if (blDevice.DeviceInformation.Kind ==
-                        Windows.Devices.Enumeration.DeviceInformationKind.AssociationEndpoint)
-                {
-
-                    var scanresp = args.AdvertisementType;
-                    Windows.Devices.Enumeration.DeviceAccessStatus result;
-                    try
-                    {
-                        result = await blDevice.RequestAccessAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        result = Windows.Devices.Enumeration.DeviceAccessStatus.DeniedBySystem;
-                    }
-                    if (result == Windows.Devices.Enumeration.DeviceAccessStatus.Allowed)
+                if (!(blDevice == null))
+                {              
+                    var name = blDevice.Name;
+                    if (blDevice.DeviceInformation.Kind ==
+                            Windows.Devices.Enumeration.DeviceInformationKind.AssociationEndpoint)
                     {
 
-                        name = blDevice.Name;
-                        System.Diagnostics.Debug.WriteLine(name);
-                        var services = await blDevice.GetGattServicesAsync();
-                        var svcs = services.Services;
-                        System.Diagnostics.Debug.WriteLine(blDevice.DeviceId);
+                        var scanresp = args.AdvertisementType;
+                        Windows.Devices.Enumeration.DeviceAccessStatus result;
+                        try
+                        {
+                            result = await blDevice.RequestAccessAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            result = Windows.Devices.Enumeration.DeviceAccessStatus.DeniedBySystem;
+                        }
+                        if (result == Windows.Devices.Enumeration.DeviceAccessStatus.Allowed)
+                        {
 
-                        System.Diagnostics.Debug.WriteLine("Start");
+                            name = blDevice.Name;
+                            System.Diagnostics.Debug.WriteLine("Endpoint Device Name: {0}",name);
+                            await PrependText(string.Format("Endpoint Device Name: {0}", name));
+                            var services = await blDevice.GetGattServicesAsync();
+                            var svcs = services.Services;
+                            System.Diagnostics.Debug.WriteLine("Endpoint Device Id: {0}",blDevice.DeviceId);
+                            await PrependText(string.Format("Endpoint Device Id: {0}", blDevice.DeviceId));
+                            System.Diagnostics.Debug.WriteLine("Start");
 
-                        TagServices = new SensorUUIDs.TagSensorServices();
-                        await TagServices.InterogateService(svcs);
-                        OK = true;
+                            TagServices = new CC2650SensorTag.TagSensorServices();
+                            await TagServices.InterogateServices(svcs);
+                            OK = true;
+                        }
                     }
                 }
             }
@@ -120,14 +130,50 @@ namespace CC2650SenorTagCreators
                     BLEAdvWatcher.Stop();
         }
 
-        private void Button_Tapped_2(object sender, TappedRoutedEventArgs e)
+        private async void Button_Tapped_2(object sender, TappedRoutedEventArgs e)
         {
-            Logging.StartLogging();
+            await Logging.StartLogging();
         }
 
         private void Button_Tapped_3(object sender, TappedRoutedEventArgs e)
         {
             Logging.StopLogging();
+        }
+
+        private async void Button_Tapped_4(object sender, TappedRoutedEventArgs e)
+        {
+            StorageFolder storageFolder = KnownFolders.DocumentsLibrary;;
+            //        Windows.Storage.StorageFolder storageFolder =
+            //Windows.Storage.ApplicationData.Current.LocalFolder;
+            var sampleFile = await storageFolder.CreateFileAsync("sample.txt",
+                    CreationCollisionOption.GenerateUniqueName);
+            //var sampleFile =
+            //   await storageFolder.GetFileAsync("sample.txt");
+        }
+
+        static MainPage MP;
+
+        public static async Task PrependTextStatic(string str)
+        {
+            await MP.PrependText(str);
+        }
+
+        public async Task PrependText(string str)
+        {
+            if (str.ToLower() == "clr")
+            {
+                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    TxtOutput.Text = "";
+                });
+            }
+            else
+            {
+                await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+               {
+                   TxtOutput.Text = str + "\r\n" + TxtOutput.Text;
+               });
+            }
         }
     }
     

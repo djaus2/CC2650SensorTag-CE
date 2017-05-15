@@ -10,18 +10,20 @@ using Windows.Storage.Streams;
 using System.Diagnostics;
 using Windows.Storage;
 using System.Threading;
+using System.Collections;
 
 namespace CC2650SenorTagCreators
 {
-    public static partial class SensorUUIDs
+    public sealed partial class CC2650SensorTag
     {
         const GattCharacteristicProperties flagNotify = GattCharacteristicProperties.Notify;
         const GattCharacteristicProperties flagRead = GattCharacteristicProperties.Read;
         const GattCharacteristicProperties flagWrite = GattCharacteristicProperties.Write;
 
-        public class TagSensorServices
+        public sealed class TagSensorServices
         {
-            public static Dictionary<SensorUUIDs.SensorIndexes, Sensor> Sensors = null;
+            public static Dictionary<CC2650SensorTag.SensorIndexes, SensorChars> Sensors = null;
+            public static Dictionary<CC2650SensorTag.SensorTagProperties, SensorChars> Properties = null;
 
             public static bool doCallback = false;
             public delegate void SensorDataDelegate(SensorData data);
@@ -30,34 +32,99 @@ namespace CC2650SenorTagCreators
             public TagSensorServices()
             {
                 if (Sensors == null)
-                    Sensors = new Dictionary<SensorIndexes, Sensor>();
+                    Sensors = new Dictionary<SensorIndexes, SensorChars>();
+                if (Properties == null)
+                    Properties = new Dictionary<SensorTagProperties, SensorChars>();
             }
-            public async Task InterogateService(IReadOnlyList<GattDeviceService> svcs)
+            public async Task InterogateServices(IReadOnlyList<GattDeviceService> svcs)
             {
                 foreach (var gattService in svcs)
                 {
 
                     var uuid = gattService.Uuid;
                     string st = uuid.ToString();
-                    System.Diagnostics.Debug.WriteLine(st);
-                    SensorUUIDs.SensorIndexes sensor = SensorUUIDs.GetSensor(st);
-                    Sensor sensorCharacteristics = new Sensor(sensor);
-                    if (sensor == SensorUUIDs.SensorIndexes.NOTFOUND)
+                    System.Diagnostics.Debug.WriteLine("Service: {0}\r\n", st);
+                    await MainPage.PrependTextStatic(string.Format("Service: {0}\r\n",st));
+                    SensorChars sensorCharacteristics = null;
+                    CC2650SensorTag.SensorTagProperties property = SensorTagProperties.NOTFOUND;
+                    CC2650SensorTag.SensorIndexes sensor = CC2650SensorTag.SensorIndexes.NOTFOUND;
+                    sensor = CC2650SensorTag.GetSensor(st);
+                    if (sensor != CC2650SensorTag.SensorIndexes.NOTFOUND)
                     {
-                        System.Diagnostics.Debug.WriteLine("Service Not Found: {0}", st);
-                        continue;
+                        sensorCharacteristics = new SensorChars(sensor);
+                        System.Diagnostics.Debug.WriteLine("Sensor: {0}", sensor);
+                        await MainPage.PrependTextStatic(string.Format("Sensor: {0}", sensor));
+                    }
+                    else
+                    {
+                        property = CC2650SensorTag.GetProperty(st);
+                        if (property == SensorTagProperties.NOTFOUND)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Service Not Found: {0}", st);
+                            await MainPage.PrependTextStatic(string.Format("Service Not Found: {0}", st));
+                            continue;
+                        }
+                        else
+                        {
+                            sensorCharacteristics = new SensorChars(property);
+                            System.Diagnostics.Debug.WriteLine("Service: {0}", property);
+                            await MainPage.PrependTextStatic(string.Format("Service: {0}", property));
+                        }
                     }
 
+
+                    //if (sensor == CC2650SensorTag.SensorIndexes.REGISTERS)
+                    //{
+                    //    System.Diagnostics.Debug.WriteLine("Service Ignored: {0}", st);
+                    //    continue;
+                    //}
+
+
+
                     var res = await gattService.GetCharacteristicsAsync();
+                    if (res.Status != GattCommunicationStatus.Success)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Error getting Characteristics in {0}/{1}. Status: {2}", sensor, property, res.Status);
+
+
+                        if (sensor != SensorIndexes.NOTFOUND)
+                            await MainPage.PrependTextStatic(string.Format("Error getting Characteristics in {0}", sensor.ToString()));
+                        else
+                            await MainPage.PrependTextStatic(string.Format("Error getting Characteristics in {0}", property.ToString()));
+
+                        continue;
+                    }
                     int count = res.Characteristics.Count();
                     var sensorCharacteristicList = res.Characteristics;
+                    if (count == 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine("No Characteristics in {0}/{1}", sensor, property);
+                        if (sensor != SensorIndexes.NOTFOUND)
+                            await MainPage.PrependTextStatic(string.Format("No Characteristics in {0}", sensor.ToString()));
+                        else
+                            await MainPage.PrependTextStatic(string.Format("No Characteristics in {0}", property.ToString()));
+
+                        continue;
+                    }
                     var characteristic1 = sensorCharacteristicList.First();
-                    System.Diagnostics.Debug.WriteLine("Sensor: {0}", sensor);
+
                     foreach (var characteristic in sensorCharacteristicList)
                     {
-                        var charType = SensorUUIDs.GetCharacteristicType(characteristic.Uuid.ToString());
-                        System.Diagnostics.Debug.WriteLine("{0} {1}", characteristic.Uuid, charType);
+                        CharacteristicTypes charType = CharacteristicTypes.NOTFOUND;
+                        SensorTagProperties charPType =SensorTagProperties.NOTFOUND;
 
+                        if (sensor != SensorIndexes.NOTFOUND)
+                        {
+                            charType = CC2650SensorTag.GetSensorCharacteristicType(characteristic.Uuid.ToString());
+                            System.Diagnostics.Debug.WriteLine("{0} {1}", characteristic.Uuid, charType);
+                            await MainPage.PrependTextStatic(string.Format("{0} {1}", characteristic.Uuid, charType));
+                        }
+                        else
+                        {
+                            charPType = CC2650SensorTag.GetPropertyCharacteristicType(characteristic.Uuid.ToString());
+                            System.Diagnostics.Debug.WriteLine("{0} {1}", characteristic.Uuid, charPType);
+                            await MainPage.PrependTextStatic(string.Format("{0} {1}", characteristic.Uuid, charPType));
+                        }
                         if (characteristic.CharacteristicProperties.HasFlag(flagNotify))
                         {
                             GattCharacteristic CharacteristicNotification = characteristic;
@@ -69,36 +136,48 @@ namespace CC2650SenorTagCreators
                             }
                         }
 
-                        switch (charType)
+                        if (sensor != SensorIndexes.NOTFOUND)
                         {
-                            case SensorUUIDs.CharacteristicTypes.Notify:
-                                sensorCharacteristics.Charcteristics.Add(SensorUUIDs.CharacteristicTypes.Notify, characteristic);
-                                break;
-                            case SensorUUIDs.CharacteristicTypes.Enable:
-                                sensorCharacteristics.Charcteristics.Add(SensorUUIDs.CharacteristicTypes.Enable, characteristic);
-                                break;
-                            case SensorUUIDs.CharacteristicTypes.Period:
-                                sensorCharacteristics.Charcteristics.Add(SensorUUIDs.CharacteristicTypes.Period, characteristic);
-                                break;
-                            case SensorUUIDs.CharacteristicTypes.Data:
-                                sensorCharacteristics.Charcteristics.Add(SensorUUIDs.CharacteristicTypes.Data, characteristic);
-                                break;
-                            case SensorUUIDs.CharacteristicTypes.Configuration:
-                                sensorCharacteristics.Charcteristics.Add(SensorUUIDs.CharacteristicTypes.Configuration, characteristic);
-                                break;
-                            case SensorUUIDs.CharacteristicTypes.Registers_Address:
-                                sensorCharacteristics.Charcteristics.Add(SensorUUIDs.CharacteristicTypes.Registers_Address, characteristic);
-                                break;
-                            case SensorUUIDs.CharacteristicTypes.Registers_Device_Id:
-                                sensorCharacteristics.Charcteristics.Add(SensorUUIDs.CharacteristicTypes.Registers_Device_Id, characteristic);
-                                break;
-                            case SensorUUIDs.CharacteristicTypes.None:
-                                break;
+                            switch (charType)
+                            {
+                                case CC2650SensorTag.CharacteristicTypes.Notify:
+                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.CharacteristicTypes.Notify, characteristic);
+                                    break;
+                                case CC2650SensorTag.CharacteristicTypes.Enable:
+                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.CharacteristicTypes.Enable, characteristic);
+                                    break;
+                                case CC2650SensorTag.CharacteristicTypes.Period:
+                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.CharacteristicTypes.Period, characteristic);
+                                    break;
+                                case CC2650SensorTag.CharacteristicTypes.Data:
+                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.CharacteristicTypes.Data, characteristic);
+                                    break;
+                                case CC2650SensorTag.CharacteristicTypes.Configuration:
+                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.CharacteristicTypes.Configuration, characteristic);
+                                    break;
+                                case CC2650SensorTag.CharacteristicTypes.Registers_Address:
+                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.CharacteristicTypes.Registers_Address, characteristic);
+                                    break;
+                                case CC2650SensorTag.CharacteristicTypes.Registers_Device_Id:
+                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.CharacteristicTypes.Registers_Device_Id, characteristic);
+                                    break;
+                                case CC2650SensorTag.CharacteristicTypes.NOTFOUND:
+                                    break;
+                            }
+                        }
+                        else
+                        {
+
+
                         }
 
                     }
-                    Sensors.Add(sensor, sensorCharacteristics);
-                    await TurnOnSensor(sensorCharacteristics); //This launches a new thread for this action but stalls the constructor thread.
+
+                    if (sensor != SensorIndexes.NOTFOUND)
+                        Sensors.Add(sensor, sensorCharacteristics);
+                    else if (property != SensorTagProperties.NOTFOUND)
+                        Properties.Add(property, sensorCharacteristics);
+                    ////await TurnOnSensor(sensorCharacteristics); //This launches a new thread for this action but stalls the constructor thread.
 
                 }
 
@@ -108,7 +187,7 @@ namespace CC2650SenorTagCreators
             bool SetSensorsManualMode = false;
             bool PeriodicUpdatesOnly = false;
 
-            private bool checkArray(SensorUUIDs.SensorIndexes SensorIndex, byte[] bArray)
+            private bool checkArray(CC2650SensorTag.SensorIndexes SensorIndex, byte[] bArray)
             {
                 bool ret = false;
                 if (bArray != null)
@@ -185,50 +264,98 @@ namespace CC2650SenorTagCreators
             {
                 var uuid = sender.Service.Uuid;
                 string st = uuid.ToString();
+                SensorData data = null;
+                long incr = 0;
 
-                SensorUUIDs.SensorIndexes sensor = SensorUUIDs.GetSensor(st);
-                System.Threading.Interlocked.Increment(ref Logging.EventCount);
+                CC2650SensorTag.SensorIndexes sensor = CC2650SensorTag.GetSensor(st);
 
+                if ( sensor != SensorIndexes.NOTFOUND)
+                { 
                 byte[] bArray = new byte[eventArgs.CharacteristicValue.Length];
                 DataReader.FromBuffer(eventArgs.CharacteristicValue).ReadBytes(bArray);
-                if ((bArray.Length == SensorUUIDs.DataLength[(int)sensor]) ||
-                    ((sensor == SensorIndexes.REGISTERS) && ((bArray.Length > 0) && (bArray.Length < 5)))) //Can be 1 to 4 for Registers
-                {
-                    //if (sensor != SensorUUIDs.SensorIndexes.REGISTERS)
-                    //    System.Diagnostics.Debug.WriteLine(st);
-
-                    SensorData data = null;
-
-                    switch (sensor)
+                    if ((bArray.Length == CC2650SensorTag.DataLength[(int)sensor]) ||
+                        ((sensor == SensorIndexes.REGISTERS) && ((bArray.Length > 0) && (bArray.Length < 5)))) //Can be 1 to 4 for Registers
                     {
-                        case SensorUUIDs.SensorIndexes.REGISTERS:
-                            data = Registers_Handler(sensor, bArray);
-                            break;
-                        case SensorUUIDs.SensorIndexes.IR_SENSOR:
-                            data = IR_Sensor_Handler(sensor, bArray);
-                            break;
-                        case SensorUUIDs.SensorIndexes.HUMIDITY:
-                            data = Humidity_Handler(sensor, bArray);
-                            break;
-                        case SensorUUIDs.SensorIndexes.BAROMETRIC_PRESSURE:
-                            data = Pressure_Handler(sensor, bArray);
-                            break;
-                        case SensorUUIDs.SensorIndexes.OPTICAL:
-                            data = Optical_Handler(sensor, bArray);
-                            break;
-                        case SensorUUIDs.SensorIndexes.IO_SENSOR:
-                            data = IO_Sensor_Handler(sensor, bArray);
-                            break;
-                        case SensorUUIDs.SensorIndexes.KEYS:
-                            data = Keys(sensor, bArray);
-                            break;
-                        case SensorUUIDs.SensorIndexes.MOVEMENT:
-                            data = Movement_Handler(sensor, bArray);
-                            break;
-                        case SensorUUIDs.SensorIndexes.NOTFOUND:
-                            data = NotFound_Handler(sensor, bArray);
-                            break;
+                        //if (sensor != SensorUUIDs.SensorIndexes.REGISTERS)
+                        //    System.Diagnostics.Debug.WriteLine(st);
+
+                        
+                        long nm = 32;
+
+                        switch (sensor)
+                        {
+                            case CC2650SensorTag.SensorIndexes.REGISTERS:
+                                data = Registers_Handler(sensor, bArray);
+                                incr = 1;
+                                break;
+                            case CC2650SensorTag.SensorIndexes.IR_SENSOR:
+                                data = IR_Sensor_Handler(sensor, bArray);
+                                incr = 100;
+                                break;
+                            case CC2650SensorTag.SensorIndexes.HUMIDITY:
+                                data = Humidity_Handler(sensor, bArray);
+                                incr = 10000;
+                                break;
+                            case CC2650SensorTag.SensorIndexes.BAROMETRIC_PRESSURE:
+                                data = Pressure_Handler(sensor, bArray);
+                                incr = 1000000;
+                                break;
+                            case CC2650SensorTag.SensorIndexes.OPTICAL:
+                                data = Optical_Handler(sensor, bArray);
+                                incr = 100000000;
+                                break;
+                            case CC2650SensorTag.SensorIndexes.IO_SENSOR:
+                                data = IO_Sensor_Handler(sensor, bArray);
+                                incr = 10000000000;
+                                break;
+                            case CC2650SensorTag.SensorIndexes.KEYS:
+                                data = Keys(sensor, bArray);
+                                incr = 1000000000000;
+                                break;
+                            case CC2650SensorTag.SensorIndexes.MOVEMENT:
+                                data = Movement_Handler(sensor, bArray);
+                                incr = 100000000000000;
+                                break;
+                            case CC2650SensorTag.SensorIndexes.NOTFOUND:
+                                data = NotFound_Handler(sensor, bArray);
+                                incr = 10000000000000000;
+                                //9223372036854775807
+                                break;
+                        }
                     }
+                    else
+                    {
+                        CC2650SensorTag.SensorTagProperties property = CC2650SensorTag.GetProperty(st);
+                        if (property != SensorTagProperties.NOTFOUND)
+                        {
+                            byte[] bArray2 = new byte[eventArgs.CharacteristicValue.Length];
+                            DataReader.FromBuffer(eventArgs.CharacteristicValue).ReadBytes(bArray2);
+                            if (true)
+                            //((bArray.Length == CC2650SensorTag.DataLength[(int)sensor]) ||
+                            //((sensor == SensorIndexes.REGISTERS) && ((bArray.Length > 0) && (bArray.Length < 5)))) //Can be 1 to 4 for Registers
+                            {
+                                //if (sensor != SensorUUIDs.SensorIndexes.REGISTERS)
+                                //    System.Diagnostics.Debug.WriteLine(st);
+
+                                data = null;
+                                long nm = 32;
+                      
+                                switch (property)
+                                {
+                                }
+                            }
+                        }
+                        else
+                        {
+                            data = NotFound_Handler(sensor, bArray);
+                            incr = 10000000000000000;
+                        }
+                    }
+                    long res;
+                    if (Logging.KeepCounting)
+                        res = System.Threading.Interlocked.Increment(ref Logging.EventCount);
+                    else
+                        res = System.Threading.Interlocked.Add(ref Logging.EventCount, incr);
 
                     if (data != null)
                     {
@@ -244,12 +371,12 @@ namespace CC2650SenorTagCreators
                 }
             }
 
-            internal SensorData NotFound_Handler(SensorUUIDs.SensorIndexes sensor, byte[] bArray)
+            internal SensorData NotFound_Handler(CC2650SensorTag.SensorIndexes sensor, byte[] bArray)
             {
                 throw new NotImplementedException();
             }
 
-            internal SensorData Movement_Handler(SensorUUIDs.SensorIndexes sensor, byte[] bArray)
+            internal SensorData Movement_Handler(CC2650SensorTag.SensorIndexes sensor, byte[] bArray)
             {
                 SensorData values = null;
 
@@ -341,13 +468,13 @@ namespace CC2650SenorTagCreators
                 return 1.0 * data;
             }
 
-            internal SensorData IO_Sensor_Handler(SensorUUIDs.SensorIndexes sensor, byte[] bArray)
+            internal SensorData IO_Sensor_Handler(CC2650SensorTag.SensorIndexes sensor, byte[] bArray)
             {
                 //throw new NotImplementedException();
                 return null;
             }
 
-            internal SensorData Optical_Handler(SensorUUIDs.SensorIndexes sensor, byte[] bArray)
+            internal SensorData Optical_Handler(CC2650SensorTag.SensorIndexes sensor, byte[] bArray)
             {
                 SensorData values = null;
 
@@ -368,7 +495,7 @@ namespace CC2650SenorTagCreators
                 return m * (0.01 * Math.Pow(2.0, e));
             }
 
-            internal SensorData Pressure_Handler(SensorUUIDs.SensorIndexes sensor, byte[] bArray)
+            internal SensorData Pressure_Handler(CC2650SensorTag.SensorIndexes sensor, byte[] bArray)
             {
                 SensorData values = null;
 
@@ -388,7 +515,7 @@ namespace CC2650SenorTagCreators
                 return values;
             }
 
-            internal SensorData Humidity_Handler(SensorUUIDs.SensorIndexes sensor, byte[] bArray)
+            internal SensorData Humidity_Handler(CC2650SensorTag.SensorIndexes sensor, byte[] bArray)
             {
                 SensorData values = null;
 
@@ -405,7 +532,7 @@ namespace CC2650SenorTagCreators
                 return values;
             }
 
-            internal SensorData IR_Sensor_Handler(SensorUUIDs.SensorIndexes sensor, byte[] bArray)
+            internal SensorData IR_Sensor_Handler(CC2650SensorTag.SensorIndexes sensor, byte[] bArray)
             {
                 SensorData values = null;
 
@@ -430,13 +557,13 @@ namespace CC2650SenorTagCreators
                 return values;
             }
 
-            internal SensorData Registers_Handler(SensorUUIDs.SensorIndexes sensor, byte[] bArray)
+            internal SensorData Registers_Handler(CC2650SensorTag.SensorIndexes sensor, byte[] bArray)
             {
                 //throw new NotImplementedException();
                 return null;
             }
 
-            internal SensorData Keys(SensorUUIDs.SensorIndexes sensor, byte[] bArray)
+            internal SensorData Keys(CC2650SensorTag.SensorIndexes sensor, byte[] bArray)
             {
                 byte data = bArray[0];
 
@@ -464,9 +591,9 @@ namespace CC2650SenorTagCreators
                 return values;
             }
 
-            public async Task TurnOnSensor(Sensor sensorCharacteristics)
+            public static async Task TurnOnSensor(SensorChars sensorCharacteristics)
             {
-                SensorUUIDs.SensorIndexes sensor = sensorCharacteristics.Sensor_Index;
+                CC2650SensorTag.SensorIndexes sensor = sensorCharacteristics.Sensor_Index;
                 Debug.WriteLine("Begin turn on sensor: " + sensor.ToString());
                 // Turn on sensor
                 try
@@ -506,9 +633,9 @@ namespace CC2650SenorTagCreators
                 Debug.WriteLine("End turn on sensor: " + sensor.ToString());
             }
 
-            public async Task TurnOffSensor(Sensor sensorCharacteristics)
+            public static async Task TurnOffSensor(SensorChars sensorCharacteristics)
             {
-                SensorUUIDs.SensorIndexes SensorIndex = sensorCharacteristics.Sensor_Index;
+                CC2650SensorTag.SensorIndexes SensorIndex = sensorCharacteristics.Sensor_Index;
                 Debug.WriteLine("Begin turn off sensor: " + SensorIndex.ToString());
 
                 try
@@ -544,10 +671,10 @@ namespace CC2650SenorTagCreators
                 Debug.WriteLine("End turn off sensor: " + SensorIndex.ToString());
             }
 
-            public async void SetSensorPeriod(Sensor sensorCharacteristics, int period)
+            public static async void SetSensorPeriod(SensorChars sensorCharacteristics, int period)
             {
 
-                SensorUUIDs.SensorIndexes SensorIndex = sensorCharacteristics.Sensor_Index;
+                CC2650SensorTag.SensorIndexes SensorIndex = sensorCharacteristics.Sensor_Index;
                 Debug.WriteLine("Begin SetSensorPeriod(): " + SensorIndex.ToString());
 
 
@@ -575,44 +702,152 @@ namespace CC2650SenorTagCreators
                 Debug.WriteLine("End SetSensorPeriod(): " + SensorIndex.ToString());
             }
         }
+        
     }
-    public static class Logging
-    { 
-        static long PerioCounter = 0;
-        static long LastEventCount = 0;
-        static Windows.Storage.StorageFile sampleFile = null;
-        static Timer EventTimer = null;
-        public static long EventCount = 0;
 
-        static int UpdatePeriod = 15000;
+
+    
+   
+    public static class Logging
+    {
+        public static bool KeepCounting = false;
+        public static string LogMsg = "";
+
+        static long PeriodCounter = 0;
+        static long LastEventCount = 0;
+        static Timer EventTimer = null;
+        public static long EventCount;
+
+        static int UpdatePeriod = 15000; //15s
 
         static private async void EventTimerCallback(object state)
         {
-            PerioCounter++;
-            long currentCount = System.Threading.Interlocked.Read(ref EventCount);
-            long diff = currentCount - LastEventCount;
-            LastEventCount = currentCount;
-
-
-            if (sampleFile == null)
+            PeriodCounter++;
+            long currentCount;
+            long diff;
+            if (KeepCounting)
             {
-                StorageFolder storageFolder = KnownFolders.DocumentsLibrary;
-                sampleFile = await storageFolder.CreateFileAsync("sample.log",
-                        CreationCollisionOption.ReplaceExisting);
+                currentCount = System.Threading.Interlocked.Read(ref EventCount);
+                diff = currentCount - LastEventCount;
+                LastEventCount = currentCount;
+            }
+            else
+            {
+                diff = 0;
+                diff = System.Threading.Interlocked.Exchange(ref EventCount, diff);
             }
 
-            if (sampleFile != null)
-                await Windows.Storage.FileIO.AppendTextAsync(sampleFile, PerioCounter.ToString() + " " + diff.ToString() + "\r\n");
+                Debug.WriteLine(PeriodCounter);
+            string logMsg = sensorCntr.ToString()+ "-" + PeriodCounter.ToString() + "-" + diff.ToString() ;
+            await MainPage.PrependTextStatic(logMsg);
+            LogMsg += logMsg + "\r\n"; ;
+
+
+            if ((PeriodCounter % SensorPeriod) == (SensorPeriod - 1))
+            {
+                PeriodCounter = 0;
+
+                StorageFolder storageFolder = KnownFolders.DocumentsLibrary; 
+                var sampleFile =  await storageFolder.GetFileAsync("sensors.log");
+                await Windows.Storage.FileIO.AppendTextAsync(sampleFile, LogMsg);
+                
+
+                LogMsg = "";
+
+                await RotateEnableSensors();
+
+            }
+        }
+
+        private  const long SensorPeriod = 4; //Switch sensor every 5 minutes.
+        private static  byte sensorCntr = 0;
+
+        public static bool GetBit(this byte b, int bitNumber)
+        {
+            System.Collections.BitArray ba = new BitArray(new byte[] { b });
+            return ba.Get(bitNumber);
+        }
+
+        private static Dictionary<CC2650SensorTag.SensorIndexes, bool> SensorIsOn;
+
+
+        private static async Task RotateEnableSensors()
+        {
+            StopLogging();
+            sensorCntr++;
+            //Skip any cntr which would have IO on.
+            while (GetBit(sensorCntr, (int)CC2650SensorTag.SensorIndexes.IO_SENSOR))
+                sensorCntr++;
+            string maxSensor = "";
+            for (CC2650SensorTag.SensorIndexes sensor= CC2650SensorTag.SensorIndexes.IR_SENSOR; sensor < (CC2650SensorTag.SensorIndexes.REGISTERS); sensor++)
+            {
+                if (sensor == CC2650SensorTag.SensorIndexes.IO_SENSOR)
+                    continue;
+                //Skip IO
+
+                if (!SensorIsOn.Keys.Contains(sensor))
+                    SensorIsOn.Add(sensor, false);
+
+                
+                //else if (sensor == SensorUUIDs.SensorIndexes.KEYS)
+                //    sen++;
+                bool isToBeOn = GetBit(sensorCntr, (int)sensor); //Yes sensor here IS correct as its the sequential counter
+                if (isToBeOn != SensorIsOn[sensor])
+                {
+                    if (SensorIsOn[sensor])
+                    {
+                        if (CC2650SensorTag.TagSensorServices.Sensors.Keys.Contains(sensor))
+                            if (CC2650SensorTag.TagSensorServices.Sensors[sensor] != null)
+                                await CC2650SensorTag.TagSensorServices.TurnOffSensor(CC2650SensorTag.TagSensorServices.Sensors[sensor]);
+                    }
+                    else
+                    {
+                        if (CC2650SensorTag.TagSensorServices.Sensors.Keys.Contains(sensor))
+                            if (CC2650SensorTag.TagSensorServices.Sensors[sensor] != null)
+                                await CC2650SensorTag.TagSensorServices.TurnOnSensor(CC2650SensorTag.TagSensorServices.Sensors[sensor]);
+                    }
+
+                    SensorIsOn[sensor] = isToBeOn;
+                }
+                if (SensorIsOn[sensor])
+                    maxSensor = sensor.ToString() + "," + maxSensor;
+                else
+                    maxSensor =  "," + maxSensor;
+
+            }
+
+            StorageFolder storageFolder = KnownFolders.DocumentsLibrary; ;
+            var sampleFile = await storageFolder.GetFileAsync("sensors.log");
+
+            string hdr = string.Format("{0}---{1}\r\n", sensorCntr, maxSensor );
+            Debug.WriteLine("{0}-{1}\r\n", sensorCntr,hdr);
+            await Windows.Storage.FileIO.AppendTextAsync(sampleFile, hdr);
+
+            await MainPage.PrependTextStatic(hdr);
+            ContinueLogging();
+
         }
 
         public static  async Task StartLogging()
         {
-            PerioCounter = 0;
+            await MainPage.PrependTextStatic("clr");
+            LogMsg = "";
+            sensorCntr = 0;
+            SensorIsOn = new Dictionary<CC2650SensorTag.SensorIndexes, bool>();
+            PeriodCounter = 0;
             LastEventCount = 0;
-            StorageFolder storageFolder = KnownFolders.DocumentsLibrary;
-            sampleFile = await storageFolder.CreateFileAsync("sample.log",
+
+            StorageFolder storageFolder = KnownFolders.DocumentsLibrary;;
+            var sampleFile = await storageFolder.CreateFileAsync("sensors.log",
                     CreationCollisionOption.ReplaceExisting);
+            await RotateEnableSensors();
+
             System.Threading.Interlocked.Exchange(ref EventCount, 0);
+            ContinueLogging();
+        }
+
+        public static void ContinueLogging()
+        {
             EventTimer = new Timer(EventTimerCallback, null, 0, (int)UpdatePeriod);
         }
 
