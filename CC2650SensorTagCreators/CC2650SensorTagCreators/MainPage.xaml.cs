@@ -175,6 +175,19 @@ namespace CC2650SenorTagCreators
                });
             }
         }
+
+        private async void Button_Tapped_5(object sender, TappedRoutedEventArgs e)
+        {
+            var res = await CC2650SensorTag.GetBatteryLevel();
+            if (res != null)
+                if (res.Length > 0)
+                    await PrependTextStatic(string.Format("Battery Level: {0}\r\n", res[0]));
+        }
+
+        private async void Button_Tapped_6(object sender, TappedRoutedEventArgs e)
+        {
+            var res = await CC2650SensorTag.GetProperties(true);
+        }
     }
     
 }

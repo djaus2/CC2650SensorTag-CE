@@ -38,6 +38,7 @@ namespace CC2650SenorTagCreators
             }
             public async Task InterogateServices(IReadOnlyList<GattDeviceService> svcs)
             {
+
                 foreach (var gattService in svcs)
                 {
 
@@ -46,6 +47,7 @@ namespace CC2650SenorTagCreators
                     System.Diagnostics.Debug.WriteLine("Service: {0}\r\n", st);
                     await MainPage.PrependTextStatic(string.Format("Service: {0}\r\n",st));
                     SensorChars sensorCharacteristics = null;
+
                     CC2650SensorTag.SensorTagProperties property = SensorTagProperties.NOTFOUND;
                     CC2650SensorTag.SensorIndexes sensor = CC2650SensorTag.SensorIndexes.NOTFOUND;
                     sensor = CC2650SensorTag.GetSensor(st);
@@ -60,6 +62,7 @@ namespace CC2650SenorTagCreators
                         property = CC2650SensorTag.GetProperty(st);
                         if (property == SensorTagProperties.NOTFOUND)
                         {
+
                             System.Diagnostics.Debug.WriteLine("Service Not Found: {0}", st);
                             await MainPage.PrependTextStatic(string.Format("Service Not Found: {0}", st));
                             continue;
@@ -167,8 +170,50 @@ namespace CC2650SenorTagCreators
                         }
                         else
                         {
+                            if (property != SensorTagProperties.NOTFOUND)
+                            {
+                                sensorCharacteristics.CharcteristicsP.Add(charPType, characteristic);
+                                string guidstr = "";
+                                switch (property)
+                                {
+                                    case SensorTagProperties.BatteryLevel:
+                                        DeviceBatteryLevelCharacteristic = characteristic;
+                                        break;
+                                    case SensorTagProperties.FirmwareDate:
+                                        //SensorTagProperties.FirmwareDate;
+                                        break;
+                                    case SensorTagProperties.HardwareRevision:
+                                        guidstr = UUID_PROPERTY_HW_NR;
+                                        break;
+                                    case SensorTagProperties.ManufacturerId:
+                                        guidstr = UUID_PROPERTY_MANUF_NR;
+                                        break;
+                                    case SensorTagProperties.ModelName:
+                                        guidstr = UUID_PROPERTY_MODEL_NR;
+                                        break;
+                                    case SensorTagProperties.PNPId:
+                                        guidstr = UUID_PROPERTY_PNP_ID;
+                                        break;
+                                    case SensorTagProperties.SerialNumber:
+                                        guidstr = UUID_PROPERTY_SERIAL_NR;
+                                        break;
+                                    case SensorTagProperties.SoftwareRevision:
+                                        guidstr = UUID_PROPERTY_SW_NR;
+                                        break;
+                                    case SensorTagProperties.SysId:
+                                        guidstr = UUID_PROPERTY_SYSID;
+                                        break;
+                                    case SensorTagProperties.BTSigCertification:
+                                        guidstr = UUID_PROPERTY_CERT;
+                                        break;
+                                    case SensorTagProperties.DeviceName:
+                                        guidstr = UUID_PROPERTY_NAME;
+                                        break;
+                                }
 
+                            }
 
+                            //DeviceBatteryLevelCharacteristic
                         }
 
                     }

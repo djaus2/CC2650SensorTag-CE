@@ -23,6 +23,7 @@ namespace CC2650SenorTagCreators
         public CC2650SensorTag.SensorIndexes Sensor_Index;
         public CC2650SensorTag.SensorTagProperties Property_Index;
         public Dictionary<CC2650SensorTag.CharacteristicTypes, GattCharacteristic> Charcteristics;
+        public Dictionary<CC2650SensorTag.SensorTagProperties, GattCharacteristic> CharcteristicsP;
         public CharacteristicsTypes Type;
 
         public SensorChars(CC2650SensorTag.SensorIndexes Sensor )
@@ -36,7 +37,7 @@ namespace CC2650SenorTagCreators
         {
             Property_Index = Property;
             Type = CharacteristicsTypes.property;
-            Charcteristics = new Dictionary<CC2650SensorTag.CharacteristicTypes, GattCharacteristic>();
+            CharcteristicsP = new Dictionary<CC2650SensorTag.SensorTagProperties, GattCharacteristic>();
         }
 
     }

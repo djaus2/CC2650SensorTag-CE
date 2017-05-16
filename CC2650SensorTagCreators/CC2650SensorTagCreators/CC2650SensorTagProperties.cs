@@ -45,24 +45,24 @@ namespace CC2650SenorTagCreators
         public const string UUID_PROPERTY_NAME =        "00002A00-0000-1000-8000-00805f9b34fb";
        
 
-        public enum SensorTagProperties {Generic, Appearance, Attribute, PeripheralPreferredConnectionParameters,
+        public enum SensorTagProperties {GenericService, Appearance, AttributeService, PeripheralPreferredConnectionParameters,
             SysId, DeviceName, ModelName, SerialNumber, FirmwareDate, HardwareRevision,
             SoftwareRevision, ManufacturerId, BTSigCertification, PNPId,
-            BatteryService,  BatteryLevel, Properties, NOTFOUND };
+            BatteryService,  BatteryLevel, PropertiesService, NOTFOUND };
 
         internal static readonly Dictionary<SensorTagProperties, string>PropertiesUUIdsTable
     = new Dictionary<SensorTagProperties, string>()
     {
-        { SensorTagProperties.Generic , GENERIC_SERVICE },
+        { SensorTagProperties.GenericService , GENERIC_SERVICE },
          { SensorTagProperties.Appearance , GENERIC_APPEARANCE },
           { SensorTagProperties.PeripheralPreferredConnectionParameters , GENERIC_PPCP },
 
-        { SensorTagProperties.Attribute , ATTRIBUTE },
+        { SensorTagProperties.AttributeService , ATTRIBUTE },
 
         { SensorTagProperties.BatteryService , DEVICE_BATTERY_SERVICE },
         { SensorTagProperties.BatteryLevel , DEVICE_BATTERY_LEVEL },
 
-        { SensorTagProperties.Properties , UUID_PROPERTIES_SERVICE },
+        { SensorTagProperties.PropertiesService , UUID_PROPERTIES_SERVICE },
         { SensorTagProperties.SysId , UUID_PROPERTY_SYSID },
         { SensorTagProperties.ModelName , UUID_PROPERTY_MODEL_NR },
         { SensorTagProperties.SerialNumber , UUID_PROPERTY_SERIAL_NR },
@@ -121,31 +121,46 @@ namespace CC2650SenorTagCreators
         private static GattDeviceService DeviceBatteryService = null;
         private static GattCharacteristic DeviceBatteryLevelCharacteristic = null;
 
-        public static void SetUpBattery(GattDeviceService service)
-        {
-            DeviceBatteryService = service;
-            var DeviceBatteryLevelCharacteristicList = DeviceBatteryService.GetCharacteristics(new Guid(DEVICE_BATTERY_LEVEL));
-            DeviceBatteryLevelCharacteristic = null;
-            if (DeviceBatteryLevelCharacteristicList != null)
-                if (DeviceBatteryLevelCharacteristicList.Count() > 0)
-                    DeviceBatteryLevelCharacteristic = DeviceBatteryLevelCharacteristicList[0];
-        }
+        //public static void SetUpBattery(GattDeviceService service)
+        //{
+        //    DeviceBatteryService = service;
+        //    var DeviceBatteryLevelCharacteristicList = DeviceBatteryService.GetCharacteristics(new Guid(DEVICE_BATTERY_LEVEL));
+        //    DeviceBatteryLevelCharacteristic = null;
+        //    if (DeviceBatteryLevelCharacteristicList != null)
+        //        if (DeviceBatteryLevelCharacteristicList.Count() > 0)
+        //            DeviceBatteryLevelCharacteristic = DeviceBatteryLevelCharacteristicList[0];
+        //}
 
         public static async Task<byte[]> GetBatteryLevel()
         {
             Debug.WriteLine("Begin GetBatteryLevel");
+            if (!TagSensorServices.Properties.Keys.Contains(SensorTagProperties.BatteryService))
+            {
+                Debug.WriteLine("Error: Battery Service not available.");
+                Debug.WriteLine("End GetBatteryLevel");
+                return null;
+            }
+
+            if (!TagSensorServices.Properties[SensorTagProperties.PropertiesService].CharcteristicsP.Keys.Contains(SensorTagProperties.BatteryLevel))
+            {
+                Debug.WriteLine("Missing Property {0}", SensorTagProperties.BatteryLevel);
+                Debug.WriteLine("End GetBatteryLevel");
+                return null;
+            }
+
             byte[] bytes = null;
             GattCharacteristicProperties flag = GattCharacteristicProperties.Read;
-            if (DeviceBatteryLevelCharacteristic != null)
+            GattCharacteristic deviceBatteryLevelCharacteristic = TagSensorServices.Properties[SensorTagProperties.BatteryService].CharcteristicsP[SensorTagProperties.BatteryLevel];
+            if (deviceBatteryLevelCharacteristic != null)
             {
-                if (DeviceBatteryLevelCharacteristic.CharacteristicProperties.HasFlag(flag))
+                if (deviceBatteryLevelCharacteristic.CharacteristicProperties.HasFlag(flag))
                 {
                     try
                     {
                         GattReadResult result = null;
                         try
                         {
-                            result = await DeviceBatteryLevelCharacteristic.ReadValueAsync(Windows.Devices.Bluetooth.BluetoothCacheMode.Uncached);
+                            result = await deviceBatteryLevelCharacteristic.ReadValueAsync(Windows.Devices.Bluetooth.BluetoothCacheMode.Uncached);
                         }
                         catch (Exception ex)
                         {
@@ -191,96 +206,65 @@ namespace CC2650SenorTagCreators
 
         public static async Task<byte[]> ReadProperty(SensorTagProperties property, bool showStartEndMsg)
         {
-            //if (showStartEndMsg)
+            if (showStartEndMsg)
                 Debug.WriteLine("Begin read property: {0} ", property);
-            string guidstr = "";
+
             byte[] bytes = null;
-            switch (property)
+
+            if (!TagSensorServices.Properties.Keys.Contains(SensorTagProperties.PropertiesService))
             {
-                case SensorTagProperties.FirmwareDate:
-                    guidstr = UUID_PROPERTY_FW_NR;
-                    break;
-                case SensorTagProperties.HardwareRevision:
-                    guidstr = UUID_PROPERTY_HW_NR;
-                    break;
-                case SensorTagProperties.ManufacturerId:
-                    guidstr = UUID_PROPERTY_MANUF_NR;
-                    break;
-                case SensorTagProperties.ModelName:
-                    guidstr = UUID_PROPERTY_MODEL_NR;
-                    break;
-                case SensorTagProperties.PNPId:
-                    guidstr = UUID_PROPERTY_PNP_ID;
-                    break;
-                case SensorTagProperties.SerialNumber:
-                    guidstr = UUID_PROPERTY_SERIAL_NR;
-                    break;
-                case SensorTagProperties.SoftwareRevision:
-                    guidstr = UUID_PROPERTY_SW_NR;
-                    break;
-                case SensorTagProperties.SysId:
-                    guidstr = UUID_PROPERTY_SYSID;
-                    break;
-                case SensorTagProperties.BTSigCertification:
-                    guidstr = UUID_PROPERTY_CERT;
-                    break;
-                case SensorTagProperties.DeviceName:
-                    guidstr = UUID_PROPERTY_NAME;
-                    break;
-                case SensorTagProperties.BatteryLevel:
-                    return bytes;
+                Debug.WriteLine("Error: Properties database not set up.");
+                return null;
             }
 
-            IReadOnlyList<GattCharacteristic> sidCharacteristicList = DevicePropertyService.GetCharacteristics(new Guid(guidstr));
+            if (!TagSensorServices.Properties[SensorTagProperties.PropertiesService].CharcteristicsP.Keys.Contains(property))
+            {
+                Debug.WriteLine("Missing Property {0}", property);
+                return null;
+            }
+
             GattCharacteristicProperties flag = GattCharacteristicProperties.Read;
-            if (sidCharacteristicList != null)
-                if (sidCharacteristicList.Count != 0)
+            GattCharacteristic characteristic = TagSensorServices.Properties[SensorTagProperties.PropertiesService].CharcteristicsP[property];
+
+            if (characteristic.CharacteristicProperties.HasFlag(flag))
+            {
+                try
                 {
-                    GattCharacteristic characteristic = sidCharacteristicList[0];
-                    if (characteristic.CharacteristicProperties.HasFlag(flag))
+                    GattReadResult result = null;
+                    try
                     {
-                        try
-                        {
-                            GattReadResult result = null;
-                            try
-                            {
-                                result = await characteristic.ReadValueAsync(Windows.Devices.Bluetooth.BluetoothCacheMode.Uncached);
-                            }
-                            catch (Exception ex)
-                            {
-                                string msg = ex.Message;
-                                Debug.WriteLine("Error ReadProperty1(): " + msg);
-                            }
-
-                            var status = result.Status;
-                            if (status == GattCommunicationStatus.Success)
-                            {
-                                var dat = result.Value;
-                                var xx = dat.GetType();
-                                var yy = dat.Capacity;
-                                var zz = dat.Length;
-
-                                bytes = new byte[result.Value.Length];
-
-                                Windows.Storage.Streams.DataReader.FromBuffer(result.Value).ReadBytes(bytes);
-                                IncProgressCounter();
-
-                            }
-                        }
-
-                        catch (Exception ex)
-                        {
-                            string msg = ex.Message;
-                            Debug.WriteLine("Error ReadProperty2(): " + msg);
-                        }
-
-
+                        result = await characteristic.ReadValueAsync(Windows.Devices.Bluetooth.BluetoothCacheMode.Uncached);
+                    }
+                    catch (Exception ex)
+                    {
+                        string msg = ex.Message;
+                        Debug.WriteLine("Error ReadProperty1(): " + msg);
                     }
 
-                    
+                    var status = result.Status;
+                    if (status == GattCommunicationStatus.Success)
+                    {
+                        var dat = result.Value;
+                        var xx = dat.GetType();
+                        var yy = dat.Capacity;
+                        var zz = dat.Length;
+
+                        bytes = new byte[result.Value.Length];
+
+                        Windows.Storage.Streams.DataReader.FromBuffer(result.Value).ReadBytes(bytes);
+                        IncProgressCounter();
+                    }
                 }
-            //if(showStartEndMsg)
-            Debug.WriteLine("End read property: {0} ", property);
+
+                catch (Exception ex)
+                {
+                    string msg = ex.Message;
+                    Debug.WriteLine("Error ReadProperty2(): " + msg);
+                }
+            }                  
+        
+            if(showStartEndMsg)
+                Debug.WriteLine("End read property: {0} ", property);
 
             return bytes;
         }
@@ -291,12 +275,19 @@ namespace CC2650SenorTagCreators
         //Don't do battery at startup as its called when battery service is started.
         public async static Task<Dictionary<SensorTagProperties, byte[]> > GetProperties(bool doBattery)
         {
+            if (!TagSensorServices.Properties.Keys.Contains(SensorTagProperties.PropertiesService))
+            {
+                Debug.WriteLine("Error: Properties database not set up.");
+                return null;
+            }
+
             byte[] bytes = null;
             Dictionary<SensorTagProperties, byte[]> deviceProprties = new Dictionary<SensorTagProperties, byte[]>();
 
             Array values = Enum.GetValues(typeof(SensorTagProperties));
 
-            foreach (SensorTagProperties val in values)
+            //foreach (SensorTagProperties val in values)
+            for (SensorTagProperties val= SensorTagProperties.SysId; val<= SensorTagProperties.PNPId; val++ )
             {
                 bytes = null;
                 if (val == SensorTagProperties.BatteryLevel)
