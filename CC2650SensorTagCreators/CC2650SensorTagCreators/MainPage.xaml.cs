@@ -36,7 +36,7 @@ namespace CC2650SenorTagCreators
     {
         BluetoothLEAdvertisementWatcher BLEAdvWatcher;
         CC2650SensorTag.TagSensorServices TagServices = null;
-        CC2650SensorTag.PropertyClass PropertyService = null;
+        CC2650SensorTag.PropertyService PropertyService = null;
 
         public MainPage()
         {
@@ -44,7 +44,7 @@ namespace CC2650SenorTagCreators
             CC2650SensorTag.Init();
 
             TagServices = new CC2650SensorTag.TagSensorServices();
-            PropertyService = new CC2650SensorTag.PropertyClass();
+            PropertyService = new CC2650SensorTag.PropertyService();
             TagServices.PropertyCls = PropertyService;
 
 
@@ -161,7 +161,7 @@ namespace CC2650SenorTagCreators
 
         public static async Task PrependTextStatic(string str)
         {
-            await MP.PrependText(str);
+            await MP.PrependText(str); 
         }
 
         public async Task PrependText(string str)
@@ -202,7 +202,7 @@ namespace CC2650SenorTagCreators
                         {
                             await PrependTextStatic("cls");
                             string strn = "";
-                            if (!CC2650SensorTag.PropertyClass.showbytes.Contains(x.Key))
+                            if (!CC2650SensorTag.PropertyService.showbytes.Contains(x.Key))
                             {
                                 strn = System.Text.Encoding.UTF8.GetString(bytes);
                                 if (strn != null)

@@ -19,8 +19,9 @@ namespace CC2650SenorTagCreators
     public sealed partial class CC2650SensorTag
     {
 
-        public class PropertyClass
+        public class PropertyService
         {
+            //A GATT Service has Characteristics which if Readable can (in this case) return SensorTag properties
 
             public Dictionary<SensorTagProperties, SensorChars> Properties = null;
 
@@ -28,6 +29,8 @@ namespace CC2650SenorTagCreators
 
 
             public const string BATTERY_UUID = "2A19"; // "AA71"
+
+            //Service and Characteristic UUIDs are listed together in these tables
 
             public const string DEVICE_BATTERY_SERVICE =    "0000180F-0000-1000-8000-00805F9B34FB";
             public const string DEVICE_BATTERY_LEVEL =      "00002A19-0000-1000-8000-00805F9B34FB";
@@ -51,58 +54,8 @@ namespace CC2650SenorTagCreators
             public const string UUID_PROPERTY_NAME =        "00002A00-0000-1000-8000-00805f9b34fb";
 
             /// <summary>
-            /// Services are the Services
-            /// Others are the Service Characteristics
-            /// Services precede their Charactedristics.
-            /// Hence Attribute Servive has no Characteristics
+            /// Look up a service/property(characteristic)'s UUID
             /// </summary>
-            public enum SensorTagProperties
-            {
-                GenericService, Appearance, PeripheralPreferredConnectionParameters,
-                AttributeService,
-                PropertiesService, SysId, DeviceName, ModelName, SerialNumber, FirmwareDate,
-                HardwareRevision, SoftwareRevision, ManufacturerId, BTSigCertification, PNPId,
-                BatteryService, BatteryLevel, NOTFOUND
-            };
-
-            /// <summary>
-            /// Generate PropertiesPropertyTable from PropertiesUUIdsTable
-            /// Swap keys with values
-            /// </summary>
-            public  PropertyClass()
-            {
-                Properties = new Dictionary<SensorTagProperties, SensorChars>();
-
-                UUIDsPropertyTable = new Dictionary<string, SensorTagProperties>();
-                foreach (var x in PropertiesUUIdsTable)
-                    if (!UUIDsPropertyTable.Keys.Contains(x.Value.ToUpper()))
-                        UUIDsPropertyTable.Add(x.Value.ToUpper(), x.Key);
-                    else
-                    {
-                        //Errant condition
-                        //Each value and each key shuld be unique in the original table
-                        //Note ToUpper so all searches based on UUIDs use UC of strings
-                    }
-            }
-
-            internal  SensorTagProperties GetProperty(string uuid)
-            {
-                SensorTagProperties property = SensorTagProperties.NOTFOUND;
-                if (UUIDsPropertyTable.Keys.Contains(uuid.ToUpper()))
-                {
-                    property = UUIDsPropertyTable[uuid.ToUpper()];
-                }
-                return property;
-            }
-
-            internal  SensorTagProperties GetPropertyCharacteristicType(string uuid)
-            {
-                SensorTagProperties res = SensorTagProperties.NOTFOUND;
-                if (UUIDsPropertyTable.Keys.Contains(uuid.ToUpper()))
-                    res = UUIDsPropertyTable[uuid.ToUpper()];
-                return res;
-            }
-
             internal static readonly Dictionary<SensorTagProperties, string> PropertiesUUIdsTable
             = new Dictionary<SensorTagProperties, string>()
             {
@@ -126,28 +79,88 @@ namespace CC2650SenorTagCreators
             { SensorTagProperties.BTSigCertification , UUID_PROPERTY_CERT },
             { SensorTagProperties.PNPId , UUID_PROPERTY_PNP_ID },
             { SensorTagProperties.DeviceName , UUID_PROPERTY_NAME },
+
             {SensorTagProperties.NOTFOUND,""},
             };
 
+            /// <summary>
+            /// Get a service/property(characteristic) from its UUID (Generated)
+            /// </summary>
             internal static Dictionary<string, SensorTagProperties> UUIDsPropertyTable = null;
 
-            public enum PropertyTypes
+            /// <summary>
+            /// Services are the Services
+            /// Others are the Service Characteristics
+            /// Services precede their Charactedristics.
+            /// Hence Attribute Servive has no Characteristics
+            /// </summary>
+            public enum SensorTagProperties
             {
-                SysId,
-                ModelName,
-                SerialNumber,
-                FirmwareDate,
-                HardwareRevision,
-                SoftwareRevision,
-                ManufacturerId,
-                BTSigCertification,
-                PNPId,
-                DeviceName,
-                None,
+                GenericService, Appearance, PeripheralPreferredConnectionParameters,
+                AttributeService,
+                PropertiesService, SysId, DeviceName, ModelName, SerialNumber, FirmwareDate,
+                HardwareRevision, SoftwareRevision, ManufacturerId, BTSigCertification, PNPId,
+                BatteryService, BatteryLevel, NOTFOUND
+            };
+
+            /// <summary>
+            /// Generate PropertiesPropertyTable from PropertiesUUIdsTable
+            /// Swap keys with values
+            /// </summary>
+            public  PropertyService()
+            {
+                Properties = new Dictionary<SensorTagProperties, SensorChars>();
+
+                UUIDsPropertyTable = new Dictionary<string, SensorTagProperties>();
+                foreach (var x in PropertiesUUIdsTable)
+                    if (!UUIDsPropertyTable.Keys.Contains(x.Value.ToUpper()))
+                        UUIDsPropertyTable.Add(x.Value.ToUpper(), x.Key);
+                    else
+                    {
+                        //Errant condition
+                        //Each value and each key shuld be unique in the original table
+                        //Note ToUpper so all searches based on UUIDs use UC of strings
+                    }
+            }
+
+            /// <summary>
+            /// Look up a property(service or characteristic) based upon its UUID.
+            /// Avoid possible error if UUID isn't in the table
+            /// </summary>
+            /// <param name="uuid"></param>
+            /// <returns>The Service or Characteristic(Property)</returns>
+            internal  SensorTagProperties GetProperty(string uuid)
+            {
+                SensorTagProperties property = SensorTagProperties.NOTFOUND;
+                if (UUIDsPropertyTable.Keys.Contains(uuid.ToUpper()))
+                {
+                    property = UUIDsPropertyTable[uuid.ToUpper()];
+                }
+                return property;
+            }
+
+            /// <summary>
+            /// NB: Should be able to merge this with the previous method (2Do)
+            /// Look up a property(service or characteristic) based upon its UUID.
+            /// Avoid possible error if UUID isn't in the table
+            /// </summary>
+            /// <param name="uuid"></param>
+            /// <returns>The Service or Characteristic(Property)</returns>
+            internal SensorTagProperties GetPropertyCharacteristicType(string uuid)
+            {
+                SensorTagProperties res = SensorTagProperties.NOTFOUND;
+                if (UUIDsPropertyTable.Keys.Contains(uuid.ToUpper()))
+                    res = UUIDsPropertyTable[uuid.ToUpper()];
+                return res;
             }
 
 
 
+
+            /// <summary>
+            /// These are were used to pass info back the MainPage.
+            /// Not used at momemnt in this version of the app
+            /// </summary>
             public static SetupProgressDel SetUpProgress { get; set; } = null;
             public static PassInt SetBatteryLevel { get; set; } = null;
             public static void IncProgressCounter()
@@ -155,6 +168,10 @@ namespace CC2650SenorTagCreators
                 SetUpProgress?.Invoke();
             }
 
+            /// <summary>
+            /// Look up battery level from Battery Service
+            /// </summary>
+            /// <returns>%Battery level (0-100)</returns>
             public async Task<byte[]> GetBatteryLevel()
             {
                 Debug.WriteLine("Begin GetBatteryLevel");
@@ -230,6 +247,12 @@ namespace CC2650SenorTagCreators
                 return bytes;
             }
 
+            /// <summary>
+            /// Look up a specific SensorTag property using Property Service
+            /// </summary>
+            /// <param name="property">The property to look upo</param>
+            /// <param name="showStartEndMsg">Debugging option</param>
+            /// <returns>Byte[]</returns>
             public async Task<byte[]> ReadProperty(SensorTagProperties property, bool showStartEndMsg)
             {
                 if (showStartEndMsg)
@@ -296,9 +319,16 @@ namespace CC2650SenorTagCreators
             }
 
 
+            /// <summary>
+            /// If in list, when a property is in list, property value bytes are treated as byte array
+            /// If not in a list the property bytes are treated as a string
+            /// </summary>
             public static List<SensorTagProperties> showbytes = new List<SensorTagProperties>() { SensorTagProperties.BatteryLevel, SensorTagProperties.SysId, SensorTagProperties.BTSigCertification, SensorTagProperties.PNPId };
 
-            //Don't do battery at startup as its called when battery service is started.
+            /// <summary>
+            /// Look up all property values for SensorTag
+            /// </summary>
+            /// <returns>list of properties and byte[]</returns>
             public async Task<Dictionary<SensorTagProperties, byte[]>> GetProperties(bool doBattery)
             {
                 if (!Properties.Keys.Contains(SensorTagProperties.PropertiesService))
@@ -367,8 +397,6 @@ namespace CC2650SenorTagCreators
                 }
                 return deviceProprties;
             }
-
-
         }
 
     }

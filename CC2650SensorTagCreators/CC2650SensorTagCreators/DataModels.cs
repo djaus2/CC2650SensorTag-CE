@@ -21,9 +21,9 @@ namespace CC2650SenorTagCreators
     public class SensorChars
     {
         public CC2650SensorTag.SensorIndexes Sensor_Index;
-        public CC2650SensorTag.PropertyClass.SensorTagProperties Property_Index;
+        public CC2650SensorTag.PropertyService.SensorTagProperties Property_Index;
         public Dictionary<CC2650SensorTag.CharacteristicTypes, GattCharacteristic> Charcteristics;
-        public Dictionary<CC2650SensorTag.PropertyClass.SensorTagProperties, GattCharacteristic> CharcteristicsP;
+        public Dictionary<CC2650SensorTag.PropertyService.SensorTagProperties, GattCharacteristic> CharcteristicsP;
         public CharacteristicsTypes Type;
 
         public SensorChars(CC2650SensorTag.SensorIndexes Sensor )
@@ -33,11 +33,11 @@ namespace CC2650SenorTagCreators
             Charcteristics = new Dictionary<CC2650SensorTag.CharacteristicTypes, GattCharacteristic>();
         }
 
-        public SensorChars(CC2650SensorTag.PropertyClass.SensorTagProperties Property)
+        public SensorChars(CC2650SensorTag.PropertyService.SensorTagProperties Property)
         {
             Property_Index = Property;
             Type = CharacteristicsTypes.property;
-            CharcteristicsP = new Dictionary<CC2650SensorTag.PropertyClass.SensorTagProperties, GattCharacteristic>();
+            CharcteristicsP = new Dictionary<CC2650SensorTag.PropertyService.SensorTagProperties, GattCharacteristic>();
         }
 
     }
@@ -57,13 +57,13 @@ namespace CC2650SenorTagCreators
 
     public class PropertyCharacteristics
     {
-        public CC2650SensorTag.PropertyClass.SensorTagProperties Property;
-        public Dictionary<CC2650SensorTag.PropertyClass.SensorTagProperties, GattCharacteristic> Charcteristics;
+        public CC2650SensorTag.PropertyService.SensorTagProperties Property;
+        public Dictionary<CC2650SensorTag.PropertyService.SensorTagProperties, GattCharacteristic> Charcteristics;
 
-        public PropertyCharacteristics(CC2650SensorTag.PropertyClass.SensorTagProperties property)
+        public PropertyCharacteristics(CC2650SensorTag.PropertyService.SensorTagProperties property)
         {
             Property = property;
-            Charcteristics = new Dictionary<CC2650SensorTag.PropertyClass.SensorTagProperties, GattCharacteristic>();
+            Charcteristics = new Dictionary<CC2650SensorTag.PropertyService.SensorTagProperties, GattCharacteristic>();
         }
     }
 }

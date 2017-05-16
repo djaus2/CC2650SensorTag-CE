@@ -19,7 +19,7 @@ namespace CC2650SenorTagCreators
 
         public sealed class TagSensorServices
         {
-            public PropertyClass PropertyCls { get; set; } = null;
+            public PropertyService PropertyCls { get; set; } = null;
             public static Dictionary<CC2650SensorTag.SensorIndexes, SensorChars> Sensors = null;
             //public static Dictionary<CC2650SensorTag.SensorTagProperties, SensorChars> Properties = null;
 
@@ -32,7 +32,7 @@ namespace CC2650SenorTagCreators
                 if (Sensors == null)
                     Sensors = new Dictionary<SensorIndexes, SensorChars>();
                 if (PropertyCls==null)
-                    PropertyCls = new PropertyClass();
+                    PropertyCls = new PropertyService();
             }
             public async Task InterogateServices(IReadOnlyList<GattDeviceService> svcs)
             {
@@ -46,7 +46,7 @@ namespace CC2650SenorTagCreators
                     await MainPage.PrependTextStatic(string.Format("Service: {0}\r\n",st));
                     SensorChars sensorCharacteristics = null;
 
-                    PropertyClass.SensorTagProperties property = PropertyClass.SensorTagProperties.NOTFOUND;
+                    PropertyService.SensorTagProperties property = PropertyService.SensorTagProperties.NOTFOUND;
 
                     CC2650SensorTag.SensorIndexes sensor = CC2650SensorTag.SensorIndexes.NOTFOUND;
                     sensor = CC2650SensorTag.GetSensor(st);
@@ -59,7 +59,7 @@ namespace CC2650SenorTagCreators
                     else
                     {
                         property = PropertyCls.GetProperty(st);
-                        if (property == PropertyClass.SensorTagProperties.NOTFOUND)
+                        if (property == PropertyService.SensorTagProperties.NOTFOUND)
                         {
 
                             System.Diagnostics.Debug.WriteLine("Service Not Found: {0}", st);
@@ -113,7 +113,7 @@ namespace CC2650SenorTagCreators
                     foreach (var characteristic in sensorCharacteristicList)
                     {
                         CharacteristicTypes charType = CharacteristicTypes.NOTFOUND;
-                        PropertyClass.SensorTagProperties charPType = PropertyClass.SensorTagProperties.NOTFOUND;
+                        PropertyService.SensorTagProperties charPType = PropertyService.SensorTagProperties.NOTFOUND;
 
                         if (sensor != SensorIndexes.NOTFOUND)
                         {
@@ -169,7 +169,7 @@ namespace CC2650SenorTagCreators
                         }
                         else
                         {
-                            if (property != PropertyClass.SensorTagProperties.NOTFOUND)
+                            if (property != PropertyService.SensorTagProperties.NOTFOUND)
                             {
                                 sensorCharacteristics.CharcteristicsP.Add(charPType, characteristic);
                             }
@@ -179,7 +179,7 @@ namespace CC2650SenorTagCreators
 
                     if (sensor != SensorIndexes.NOTFOUND)
                         Sensors.Add(sensor, sensorCharacteristics);
-                    else if (property != PropertyClass.SensorTagProperties.NOTFOUND)
+                    else if (property != PropertyService.SensorTagProperties.NOTFOUND)
                         PropertyCls.Properties.Add(property, sensorCharacteristics);
 
                 }
@@ -328,8 +328,8 @@ namespace CC2650SenorTagCreators
                     }
                     else
                     {
-                        PropertyClass.SensorTagProperties property = PropertyCls.GetProperty(st);
-                        if (property != PropertyClass.SensorTagProperties.NOTFOUND)
+                        PropertyService.SensorTagProperties property = PropertyCls.GetProperty(st);
+                        if (property != PropertyService.SensorTagProperties.NOTFOUND)
                         {
                             byte[] bArray2 = new byte[eventArgs.CharacteristicValue.Length];
                             DataReader.FromBuffer(eventArgs.CharacteristicValue).ReadBytes(bArray2);
