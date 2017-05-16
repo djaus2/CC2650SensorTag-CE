@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Devices.Bluetooth;
-using Windows.Devices.Bluetooth.Advertisement;
-using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Storage.Streams;
-using System.Diagnostics;
-using Windows.Storage;
-using System.Threading;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace CC2650SenorTagCreators
 {
@@ -22,8 +19,9 @@ namespace CC2650SenorTagCreators
 
         public sealed class TagSensorServices
         {
+            public PropertyClass PropertyCls { get; set; } = null;
             public static Dictionary<CC2650SensorTag.SensorIndexes, SensorChars> Sensors = null;
-            public static Dictionary<CC2650SensorTag.SensorTagProperties, SensorChars> Properties = null;
+            //public static Dictionary<CC2650SensorTag.SensorTagProperties, SensorChars> Properties = null;
 
             public static bool doCallback = false;
             public delegate void SensorDataDelegate(SensorData data);
@@ -33,8 +31,8 @@ namespace CC2650SenorTagCreators
             {
                 if (Sensors == null)
                     Sensors = new Dictionary<SensorIndexes, SensorChars>();
-                if (Properties == null)
-                    Properties = new Dictionary<SensorTagProperties, SensorChars>();
+                if (PropertyCls==null)
+                    PropertyCls = new PropertyClass();
             }
             public async Task InterogateServices(IReadOnlyList<GattDeviceService> svcs)
             {
@@ -48,7 +46,8 @@ namespace CC2650SenorTagCreators
                     await MainPage.PrependTextStatic(string.Format("Service: {0}\r\n",st));
                     SensorChars sensorCharacteristics = null;
 
-                    CC2650SensorTag.SensorTagProperties property = SensorTagProperties.NOTFOUND;
+                    PropertyClass.SensorTagProperties property = PropertyClass.SensorTagProperties.NOTFOUND;
+
                     CC2650SensorTag.SensorIndexes sensor = CC2650SensorTag.SensorIndexes.NOTFOUND;
                     sensor = CC2650SensorTag.GetSensor(st);
                     if (sensor != CC2650SensorTag.SensorIndexes.NOTFOUND)
@@ -59,8 +58,8 @@ namespace CC2650SenorTagCreators
                     }
                     else
                     {
-                        property = CC2650SensorTag.GetProperty(st);
-                        if (property == SensorTagProperties.NOTFOUND)
+                        property = PropertyCls.GetProperty(st);
+                        if (property == PropertyClass.SensorTagProperties.NOTFOUND)
                         {
 
                             System.Diagnostics.Debug.WriteLine("Service Not Found: {0}", st);
@@ -114,7 +113,7 @@ namespace CC2650SenorTagCreators
                     foreach (var characteristic in sensorCharacteristicList)
                     {
                         CharacteristicTypes charType = CharacteristicTypes.NOTFOUND;
-                        SensorTagProperties charPType =SensorTagProperties.NOTFOUND;
+                        PropertyClass.SensorTagProperties charPType = PropertyClass.SensorTagProperties.NOTFOUND;
 
                         if (sensor != SensorIndexes.NOTFOUND)
                         {
@@ -124,7 +123,7 @@ namespace CC2650SenorTagCreators
                         }
                         else
                         {
-                            charPType = CC2650SensorTag.GetPropertyCharacteristicType(characteristic.Uuid.ToString());
+                            charPType = PropertyCls.GetPropertyCharacteristicType(characteristic.Uuid.ToString());
                             System.Diagnostics.Debug.WriteLine("{0} {1}", characteristic.Uuid, charPType);
                             await MainPage.PrependTextStatic(string.Format("{0} {1}", characteristic.Uuid, charPType));
                         }
@@ -170,59 +169,18 @@ namespace CC2650SenorTagCreators
                         }
                         else
                         {
-                            if (property != SensorTagProperties.NOTFOUND)
+                            if (property != PropertyClass.SensorTagProperties.NOTFOUND)
                             {
                                 sensorCharacteristics.CharcteristicsP.Add(charPType, characteristic);
-                                string guidstr = "";
-                                switch (property)
-                                {
-                                    case SensorTagProperties.BatteryLevel:
-                                        DeviceBatteryLevelCharacteristic = characteristic;
-                                        break;
-                                    case SensorTagProperties.FirmwareDate:
-                                        //SensorTagProperties.FirmwareDate;
-                                        break;
-                                    case SensorTagProperties.HardwareRevision:
-                                        guidstr = UUID_PROPERTY_HW_NR;
-                                        break;
-                                    case SensorTagProperties.ManufacturerId:
-                                        guidstr = UUID_PROPERTY_MANUF_NR;
-                                        break;
-                                    case SensorTagProperties.ModelName:
-                                        guidstr = UUID_PROPERTY_MODEL_NR;
-                                        break;
-                                    case SensorTagProperties.PNPId:
-                                        guidstr = UUID_PROPERTY_PNP_ID;
-                                        break;
-                                    case SensorTagProperties.SerialNumber:
-                                        guidstr = UUID_PROPERTY_SERIAL_NR;
-                                        break;
-                                    case SensorTagProperties.SoftwareRevision:
-                                        guidstr = UUID_PROPERTY_SW_NR;
-                                        break;
-                                    case SensorTagProperties.SysId:
-                                        guidstr = UUID_PROPERTY_SYSID;
-                                        break;
-                                    case SensorTagProperties.BTSigCertification:
-                                        guidstr = UUID_PROPERTY_CERT;
-                                        break;
-                                    case SensorTagProperties.DeviceName:
-                                        guidstr = UUID_PROPERTY_NAME;
-                                        break;
-                                }
-
                             }
-
-                            //DeviceBatteryLevelCharacteristic
                         }
 
                     }
 
                     if (sensor != SensorIndexes.NOTFOUND)
                         Sensors.Add(sensor, sensorCharacteristics);
-                    else if (property != SensorTagProperties.NOTFOUND)
-                        Properties.Add(property, sensorCharacteristics);
-                    ////await TurnOnSensor(sensorCharacteristics); //This launches a new thread for this action but stalls the constructor thread.
+                    else if (property != PropertyClass.SensorTagProperties.NOTFOUND)
+                        PropertyCls.Properties.Add(property, sensorCharacteristics);
 
                 }
 
@@ -370,8 +328,8 @@ namespace CC2650SenorTagCreators
                     }
                     else
                     {
-                        CC2650SensorTag.SensorTagProperties property = CC2650SensorTag.GetProperty(st);
-                        if (property != SensorTagProperties.NOTFOUND)
+                        PropertyClass.SensorTagProperties property = PropertyCls.GetProperty(st);
+                        if (property != PropertyClass.SensorTagProperties.NOTFOUND)
                         {
                             byte[] bArray2 = new byte[eventArgs.CharacteristicValue.Length];
                             DataReader.FromBuffer(eventArgs.CharacteristicValue).ReadBytes(bArray2);
@@ -875,7 +833,7 @@ namespace CC2650SenorTagCreators
 
         public static  async Task StartLogging()
         {
-            await MainPage.PrependTextStatic("clr");
+            await MainPage.PrependTextStatic("cls");
             LogMsg = "";
             sensorCntr = 0;
             SensorIsOn = new Dictionary<CC2650SensorTag.SensorIndexes, bool>();

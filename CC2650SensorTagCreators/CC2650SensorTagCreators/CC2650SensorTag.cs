@@ -82,6 +82,7 @@ namespace CC2650SenorTagCreators
 
         //The reverse of table  SensorsUUIDs
         internal static  Dictionary<string, SensorIndexes> UUIDsSensorsTable =null;
+        
 
         /// <summary>
         /// Generate UUIDsSensorsTable from SensorsUUIDsTable
@@ -89,6 +90,7 @@ namespace CC2650SenorTagCreators
         /// </summary>
         public static void InitSensorIndexUUIDs()
         {
+
             UUIDsSensorsTable  =  new Dictionary<string, SensorIndexes>();
             foreach (var x in SensorsUUIDsTable)
                 if (!UUIDsSensorsTable .Keys.Contains(x.Value.ToUpper()))
@@ -113,17 +115,7 @@ namespace CC2650SenorTagCreators
             return sensor;
         }
 
-        internal static SensorTagProperties GetProperty(string uuid)
-        {
-            if (UUIDsPropertyTable == null)
-                InitPropertyUUIds();
-            SensorTagProperties property = SensorTagProperties.NOTFOUND;
-            if (UUIDsPropertyTable.Keys.Contains(uuid.ToUpper()))
-            {
-                property = UUIDsPropertyTable[uuid.ToUpper()];
-            }
-            return property;
-        }
+
 
 
         //Characteristics lookup table
@@ -139,8 +131,7 @@ namespace CC2650SenorTagCreators
         {
             if (UUIDsSensorsTable  == null)
                 InitSensorIndexUUIDs();
-            if(UUIDsPropertyTable==null)
-                InitPropertyUUIds();
+    
 
 
 
@@ -198,15 +189,7 @@ namespace CC2650SenorTagCreators
             return res;
         }
 
-        internal static SensorTagProperties GetPropertyCharacteristicType(string uuid)
-        {
-            if (UUIDsPropertyTable == null)
-                InitPropertyUUIds();
-            SensorTagProperties res = SensorTagProperties.NOTFOUND;
-            if (UUIDsPropertyTable.Keys.Contains(uuid.ToUpper()))
-                res = UUIDsPropertyTable[uuid.ToUpper()];
-            return res;
-        }
+
 
         //The characteristics types
         public enum CharacteristicTypes

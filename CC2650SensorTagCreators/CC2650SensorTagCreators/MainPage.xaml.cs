@@ -35,12 +35,18 @@ namespace CC2650SenorTagCreators
     public sealed partial class MainPage : Page
     {
         BluetoothLEAdvertisementWatcher BLEAdvWatcher;
-        
+        CC2650SensorTag.TagSensorServices TagServices = null;
+        CC2650SensorTag.PropertyClass PropertyService = null;
 
         public MainPage()
         {
             this.InitializeComponent();
             CC2650SensorTag.Init();
+
+            TagServices = new CC2650SensorTag.TagSensorServices();
+            PropertyService = new CC2650SensorTag.PropertyClass();
+            TagServices.PropertyCls = PropertyService;
+
 
             MP = this;
         }
@@ -62,7 +68,7 @@ namespace CC2650SenorTagCreators
 
 
         long barrier = 0;
-        CC2650SensorTag.TagSensorServices TagServices;
+
         private async void Bleaw_Received(BluetoothLEAdvertisementWatcher sender, BluetoothLEAdvertisementReceivedEventArgs args)
         {
             if (sender == null)
@@ -104,7 +110,7 @@ namespace CC2650SenorTagCreators
                             await PrependText(string.Format("Endpoint Device Id: {0}", blDevice.DeviceId));
                             System.Diagnostics.Debug.WriteLine("Start");
 
-                            TagServices = new CC2650SensorTag.TagSensorServices();
+                            
                             await TagServices.InterogateServices(svcs);
                             OK = true;
                         }
@@ -160,7 +166,7 @@ namespace CC2650SenorTagCreators
 
         public async Task PrependText(string str)
         {
-            if (str.ToLower() == "clr")
+            if (str.ToLower() == "cls")
             {
                 await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
@@ -178,7 +184,7 @@ namespace CC2650SenorTagCreators
 
         private async void Button_Tapped_5(object sender, TappedRoutedEventArgs e)
         {
-            var res = await CC2650SensorTag.GetBatteryLevel();
+            var res = await PropertyService.GetBatteryLevel();
             if (res != null)
                 if (res.Length > 0)
                     await PrependTextStatic(string.Format("Battery Level: {0}\r\n", res[0]));
@@ -186,7 +192,53 @@ namespace CC2650SenorTagCreators
 
         private async void Button_Tapped_6(object sender, TappedRoutedEventArgs e)
         {
-            var res = await CC2650SensorTag.GetProperties(true);
+            var res = await PropertyService.GetProperties(true);
+            if (res != null)
+                if (res.Count > 0)
+                    foreach (var x in res)
+                    {
+                        byte[] bytes = x.Value;
+                        if (bytes != null)
+                        {
+                            await PrependTextStatic("cls");
+                            string strn = "";
+                            if (!CC2650SensorTag.PropertyClass.showbytes.Contains(x.Key))
+                            {
+                                strn = System.Text.Encoding.UTF8.GetString(bytes);
+                                if (strn != null)
+                                {
+                                    if (strn != "")
+                                    {
+                                        await PrependTextStatic(string.Format("{0} [{1}]: {2}", x.Key, strn.Length, strn));
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                strn =  "";
+                                for (int i = 0; i < bytes.Length; i++)
+                                {
+                                    strn += " " + bytes[i].ToString("X2");
+                                }
+                                if (strn != "")
+                                {
+                                    await PrependTextStatic(string.Format("{0} [{1}]: [{2} ]", x.Key, bytes.Length, strn));
+                                }
+                            }
+                                //NB:
+                                //    Re: PNP_ID App got: pnp_id[7] { 01 0D 00 00 00 10 01 }
+                                //    From:
+                                //    https://e2e.ti.com/support/wireless_connectivity/bluetooth_low_energy/f/538/p/434053/1556237
+                                //
+                                //    In devinfoservice.c, you can find vendor ID and product ID information below where TI's vendor ID is 0x000D. 
+                                //    static uint8 devInfoPnpId[DEVINFO_PNP_ID_LEN] ={ 
+                                //    1, // Vendor ID source (1=Bluetooth SIG) 
+                                //    LO_UINT16(0x000D), HI_UINT16(0x000D), // Vendor ID (Texas Instruments) 
+                                //    LO_UINT16(0x0000), HI_UINT16(0x0000), // Product ID (vendor-specific) 
+                                //    LO_UINT16(0x0110), HI_UINT16(0x0110) // Product version (JJ.M.N)};  
+                                //
+                        }
+                    }
         }
     }
     
