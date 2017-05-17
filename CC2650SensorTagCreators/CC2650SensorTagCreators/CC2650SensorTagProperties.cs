@@ -19,7 +19,7 @@ namespace CC2650SenorTagCreators
     public sealed partial class CC2650SensorTag
     {
 
-        public class PropertyService
+        public class PropertyServiceCls
         {
             //A GATT Service has Characteristics which if Readable can (in this case) return SensorTag properties
 
@@ -107,7 +107,7 @@ namespace CC2650SenorTagCreators
             /// Generate PropertiesPropertyTable from PropertiesUUIdsTable
             /// Swap keys with values
             /// </summary>
-            public  PropertyService()
+            public  PropertyServiceCls()
             {
                 Properties = new Dictionary<SensorTagProperties, SensorChars>();
 
@@ -237,7 +237,7 @@ namespace CC2650SenorTagCreators
 
                 }
                 if (bytes != null)
-                    if (bytes.Length == CC2650SensorTag.DataLength[CC2650SensorTag.BATT_INDX])
+                    if (bytes.Length == CC2650SensorTag.SensorServicesCls.DataLength[CC2650SensorTag.SensorServicesCls.BATT_INDX])
                     {
                         Debug.WriteLine("Battery Level: {0}", bytes[0]);
                         SetBatteryLevel?.Invoke((int)bytes[0]);

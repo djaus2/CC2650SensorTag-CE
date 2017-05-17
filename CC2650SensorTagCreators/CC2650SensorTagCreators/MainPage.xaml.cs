@@ -36,18 +36,12 @@ namespace CC2650SenorTagCreators
     {
         BluetoothLEAdvertisementWatcher BLEAdvWatcher;
         CC2650SensorTag.TagSensorServices TagServices = null;
-        CC2650SensorTag.PropertyService PropertyService = null;
 
         public MainPage()
         {
             this.InitializeComponent();
-            CC2650SensorTag.Init();
 
             TagServices = new CC2650SensorTag.TagSensorServices();
-            PropertyService = new CC2650SensorTag.PropertyService();
-            TagServices.PropertyCls = PropertyService;
-
-
             MP = this;
         }
 
@@ -184,7 +178,7 @@ namespace CC2650SenorTagCreators
 
         private async void Button_Tapped_5(object sender, TappedRoutedEventArgs e)
         {
-            var res = await PropertyService.GetBatteryLevel();
+            var res = await TagServices.PropertyServices.GetBatteryLevel();
             if (res != null)
                 if (res.Length > 0)
                     await PrependTextStatic(string.Format("Battery Level: {0}\r\n", res[0]));
@@ -192,17 +186,19 @@ namespace CC2650SenorTagCreators
 
         private async void Button_Tapped_6(object sender, TappedRoutedEventArgs e)
         {
-            var res = await PropertyService.GetProperties(true);
+            var res = await TagServices.PropertyServices.GetProperties(true);
             if (res != null)
                 if (res.Count > 0)
+                {
+                    await PrependTextStatic("cls");
+                    await PrependText("SensorTag Properties: ");
                     foreach (var x in res)
                     {
                         byte[] bytes = x.Value;
                         if (bytes != null)
                         {
-                            await PrependTextStatic("cls");
                             string strn = "";
-                            if (!CC2650SensorTag.PropertyService.showbytes.Contains(x.Key))
+                            if (!CC2650SensorTag.PropertyServiceCls.showbytes.Contains(x.Key))
                             {
                                 strn = System.Text.Encoding.UTF8.GetString(bytes);
                                 if (strn != null)
@@ -215,7 +211,7 @@ namespace CC2650SenorTagCreators
                             }
                             else
                             {
-                                strn =  "";
+                                strn = "";
                                 for (int i = 0; i < bytes.Length; i++)
                                 {
                                     strn += " " + bytes[i].ToString("X2");
@@ -225,20 +221,21 @@ namespace CC2650SenorTagCreators
                                     await PrependTextStatic(string.Format("{0} [{1}]: [{2} ]", x.Key, bytes.Length, strn));
                                 }
                             }
-                                //NB:
-                                //    Re: PNP_ID App got: pnp_id[7] { 01 0D 00 00 00 10 01 }
-                                //    From:
-                                //    https://e2e.ti.com/support/wireless_connectivity/bluetooth_low_energy/f/538/p/434053/1556237
-                                //
-                                //    In devinfoservice.c, you can find vendor ID and product ID information below where TI's vendor ID is 0x000D. 
-                                //    static uint8 devInfoPnpId[DEVINFO_PNP_ID_LEN] ={ 
-                                //    1, // Vendor ID source (1=Bluetooth SIG) 
-                                //    LO_UINT16(0x000D), HI_UINT16(0x000D), // Vendor ID (Texas Instruments) 
-                                //    LO_UINT16(0x0000), HI_UINT16(0x0000), // Product ID (vendor-specific) 
-                                //    LO_UINT16(0x0110), HI_UINT16(0x0110) // Product version (JJ.M.N)};  
-                                //
+                            //NB:
+                            //    Re: PNP_ID App got: pnp_id[7] { 01 0D 00 00 00 10 01 }
+                            //    From:
+                            //    https://e2e.ti.com/support/wireless_connectivity/bluetooth_low_energy/f/538/p/434053/1556237
+                            //
+                            //    In devinfoservice.c, you can find vendor ID and product ID information below where TI's vendor ID is 0x000D. 
+                            //    static uint8 devInfoPnpId[DEVINFO_PNP_ID_LEN] ={ 
+                            //    1, // Vendor ID source (1=Bluetooth SIG) 
+                            //    LO_UINT16(0x000D), HI_UINT16(0x000D), // Vendor ID (Texas Instruments) 
+                            //    LO_UINT16(0x0000), HI_UINT16(0x0000), // Product ID (vendor-specific) 
+                            //    LO_UINT16(0x0110), HI_UINT16(0x0110) // Product version (JJ.M.N)};  
+                            //
                         }
                     }
+                }
         }
     }
     
