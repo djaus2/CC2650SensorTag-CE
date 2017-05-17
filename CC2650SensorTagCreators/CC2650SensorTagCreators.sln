@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CC2650SensorTagCreators", "CC2650SensorTagCreators\CC2650SensorTagCreators.csproj", "{A964DC13-EC7D-461C-B651-1B9546292940}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CC2650SensorTagCreatorsApp", "CC2650SensorTagCreatorsApp\CC2650SensorTagCreatorsApp.csproj", "{8054360F-9F63-4164-835B-9E3F4B383F64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -33,6 +35,24 @@ Global
 		{A964DC13-EC7D-461C-B651-1B9546292940}.Release|x86.ActiveCfg = Release|x86
 		{A964DC13-EC7D-461C-B651-1B9546292940}.Release|x86.Build.0 = Release|x86
 		{A964DC13-EC7D-461C-B651-1B9546292940}.Release|x86.Deploy.0 = Release|x86
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Debug|ARM.ActiveCfg = Debug|ARM
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Debug|ARM.Build.0 = Debug|ARM
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Debug|ARM.Deploy.0 = Debug|ARM
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Debug|x64.ActiveCfg = Debug|x64
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Debug|x64.Build.0 = Debug|x64
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Debug|x64.Deploy.0 = Debug|x64
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Debug|x86.ActiveCfg = Debug|x86
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Debug|x86.Build.0 = Debug|x86
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Debug|x86.Deploy.0 = Debug|x86
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Release|ARM.ActiveCfg = Release|ARM
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Release|ARM.Build.0 = Release|ARM
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Release|ARM.Deploy.0 = Release|ARM
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Release|x64.ActiveCfg = Release|x64
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Release|x64.Build.0 = Release|x64
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Release|x64.Deploy.0 = Release|x64
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Release|x86.ActiveCfg = Release|x86
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Release|x86.Build.0 = Release|x86
+		{8054360F-9F63-4164-835B-9E3F4B383F64}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
