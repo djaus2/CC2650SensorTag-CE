@@ -11,8 +11,11 @@ using Windows.Storage.Streams;
 
 namespace CC2650SenorTagCreators
 {
+    public delegate Task PassString(string strn);
     public sealed partial class CC2650SensorTag
     {
+        public static PassString PrependTextStatic { get; set; } = null;
+
         const GattCharacteristicProperties flagNotify = GattCharacteristicProperties.Notify;
         const GattCharacteristicProperties flagRead = GattCharacteristicProperties.Read;
         const GattCharacteristicProperties flagWrite = GattCharacteristicProperties.Write;
@@ -49,7 +52,7 @@ namespace CC2650SenorTagCreators
                     var uuid = gattService.Uuid;
                     string st = uuid.ToString();
                     System.Diagnostics.Debug.WriteLine("Service: {0}\r\n", st);
-                    await MainPage.PrependTextStatic(string.Format("Service: {0}\r\n", st));
+                    await CC2650SensorTag.PrependTextStatic(string.Format("Service: {0}\r\n", st));
                     SensorChars sensorCharacteristics = null;
 
                     PropertyServiceCls.SensorTagProperties property = PropertyServiceCls.SensorTagProperties.NOTFOUND;
@@ -60,7 +63,7 @@ namespace CC2650SenorTagCreators
                     {
                         sensorCharacteristics = new SensorChars(sensor);
                         System.Diagnostics.Debug.WriteLine("Sensor: {0}", sensor);
-                        await MainPage.PrependTextStatic(string.Format("Sensor: {0}", sensor));
+                        await CC2650SensorTag.PrependTextStatic(string.Format("Sensor: {0}", sensor));
                     }
                     else
                     {
@@ -69,14 +72,14 @@ namespace CC2650SenorTagCreators
                         {
 
                             System.Diagnostics.Debug.WriteLine("Service Not Found: {0}", st);
-                            await MainPage.PrependTextStatic(string.Format("Service Not Found: {0}", st));
+                            await CC2650SensorTag.PrependTextStatic(string.Format("Service Not Found: {0}", st));
                             continue;
                         }
                         else
                         {
                             sensorCharacteristics = new SensorChars(property);
                             System.Diagnostics.Debug.WriteLine("Service: {0}", property);
-                            await MainPage.PrependTextStatic(string.Format("Service: {0}", property));
+                            await CC2650SensorTag.PrependTextStatic(string.Format("Service: {0}", property));
                         }
                     }
 
@@ -96,9 +99,9 @@ namespace CC2650SenorTagCreators
 
 
                         if (sensor != SensorServicesCls.SensorIndexes.NOTFOUND)
-                            await MainPage.PrependTextStatic(string.Format("Error getting Characteristics in {0}", sensor.ToString()));
+                            await CC2650SensorTag.PrependTextStatic(string.Format("Error getting Characteristics in {0}", sensor.ToString()));
                         else
-                            await MainPage.PrependTextStatic(string.Format("Error getting Characteristics in {0}", property.ToString()));
+                            await CC2650SensorTag.PrependTextStatic(string.Format("Error getting Characteristics in {0}", property.ToString()));
 
                         continue;
                     }
@@ -108,9 +111,9 @@ namespace CC2650SenorTagCreators
                     {
                         System.Diagnostics.Debug.WriteLine("No Characteristics in {0}/{1}", sensor, property);
                         if (sensor != SensorServicesCls.SensorIndexes.NOTFOUND)
-                            await MainPage.PrependTextStatic(string.Format("No Characteristics in {0}", sensor.ToString()));
+                            await CC2650SensorTag.PrependTextStatic(string.Format("No Characteristics in {0}", sensor.ToString()));
                         else
-                            await MainPage.PrependTextStatic(string.Format("No Characteristics in {0}", property.ToString()));
+                            await CC2650SensorTag.PrependTextStatic(string.Format("No Characteristics in {0}", property.ToString()));
 
                         continue;
                     }
@@ -125,13 +128,13 @@ namespace CC2650SenorTagCreators
                         {
                             charType = SensorServicesCls.GetSensorCharacteristicType(characteristic.Uuid.ToString());
                             System.Diagnostics.Debug.WriteLine("{0} {1}", characteristic.Uuid, charType);
-                            await MainPage.PrependTextStatic(string.Format("{0} {1}", characteristic.Uuid, charType));
+                            await CC2650SensorTag.PrependTextStatic(string.Format("{0} {1}", characteristic.Uuid, charType));
                         }
                         else
                         {
                             charPType = PropertyServices.GetPropertyCharacteristicType(characteristic.Uuid.ToString());
                             System.Diagnostics.Debug.WriteLine("{0} {1}", characteristic.Uuid, charPType);
-                            await MainPage.PrependTextStatic(string.Format("{0} {1}", characteristic.Uuid, charPType));
+                            await CC2650SensorTag.PrependTextStatic(string.Format("{0} {1}", characteristic.Uuid, charPType));
                         }
                         if (characteristic.CharacteristicProperties.HasFlag(flagNotify))
                         {

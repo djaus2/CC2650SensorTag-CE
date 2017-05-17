@@ -70,11 +70,11 @@ namespace CC2650SenorTagCreators
 
                                 name = blDevice.Name;
                                 System.Diagnostics.Debug.WriteLine("Endpoint Device Name: {0}", name);
-                                await MainPage.PrependTextStatic(string.Format("Endpoint Device Name: {0}", name));
+                                await CC2650SensorTag.PrependTextStatic(string.Format("Endpoint Device Name: {0}", name));
                                 var services = await blDevice.GetGattServicesAsync();
                                 var svcs = services.Services;
                                 System.Diagnostics.Debug.WriteLine("Endpoint Device Id: {0}", blDevice.DeviceId);
-                                await MainPage.PrependTextStatic(string.Format("Endpoint Device Id: {0}", blDevice.DeviceId));
+                                await CC2650SensorTag.PrependTextStatic(string.Format("Endpoint Device Id: {0}", blDevice.DeviceId));
                                 System.Diagnostics.Debug.WriteLine("Start");
 
 
@@ -91,7 +91,7 @@ namespace CC2650SenorTagCreators
                 }
             }
 
-            internal void Stop()
+            public void Stop()
             {
                 if (BLEAdvWatcher != null)
                     if (BLEAdvWatcher.Status == BluetoothLEAdvertisementWatcherStatus.Started)

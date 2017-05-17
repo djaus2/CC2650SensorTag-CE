@@ -25,11 +25,6 @@ namespace CC2650SenorTagCreators
 {
 
 
-
-
-    /// <summary>
-        /// An empty page that can be used on its own or navigated to within a Frame.
-        /// </summary>
     public sealed partial class MainPage : Page
     {
         CC2650SensorTag.CC2650SensorTagUnpairedBTConnectivity Connectivity = null;
@@ -39,6 +34,7 @@ namespace CC2650SenorTagCreators
             this.InitializeComponent();
 
             Connectivity = new CC2650SensorTag.CC2650SensorTagUnpairedBTConnectivity();
+            CC2650SensorTag.PrependTextStatic = PrependTextStatic;
 
             MP = this;
         }

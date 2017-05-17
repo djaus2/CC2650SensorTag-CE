@@ -45,7 +45,7 @@ namespace CC2650SenorTagCreators
 
             Debug.WriteLine(PeriodCounter);
             string logMsg = sensorCntr.ToString() + "-" + PeriodCounter.ToString() + "-" + diff.ToString();
-            await MainPage.PrependTextStatic(logMsg);
+            await CC2650SensorTag.PrependTextStatic(logMsg);
             LogMsg += logMsg + "\r\n"; ;
 
 
@@ -129,14 +129,14 @@ namespace CC2650SenorTagCreators
             Debug.WriteLine("{0}-{1}\r\n", sensorCntr, hdr);
             await Windows.Storage.FileIO.AppendTextAsync(sampleFile, hdr);
 
-            await MainPage.PrependTextStatic(hdr);
+            await CC2650SensorTag.PrependTextStatic(hdr);
             ContinueLogging();
 
         }
 
         public static async Task StartLogging()
         {
-            await MainPage.PrependTextStatic("cls");
+            await CC2650SensorTag.PrependTextStatic("cls");
             LogMsg = "";
             sensorCntr = 0;
             SensorIsOn = new Dictionary<CC2650SensorTag.SensorServicesCls.SensorIndexes, bool>();
