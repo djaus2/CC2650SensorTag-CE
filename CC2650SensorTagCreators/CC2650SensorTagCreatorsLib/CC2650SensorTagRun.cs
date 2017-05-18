@@ -140,6 +140,7 @@ namespace CC2650SenorTagCreators
 
         public static async Task StartRunning(long numLoops, long period, byte sensorCntr)
         {
+            msgCounter = 0;
             await CC2650SensorTag.PrependTextStatic("cls");
             LogMsg = "";
             SensorCntr = sensorCntr;
@@ -177,10 +178,18 @@ namespace CC2650SenorTagCreators
             CC2650SensorTag.TagSensorEvents.CallMeBack = UpdateSensorDataX;
         }
 
-        
+
+        static int msgCounter = 0;
 
         public async static Task UpdateSensorDataX(SensorData data)
         {
+            //Clear the textbox buffer when has MAX LINES (MAX_LINES). 
+            if (msgCounter++ > CC2650SensorTag.MAX_LINES)
+            {
+                msgCounter = 0;
+                await CC2650SensorTag.PrependTextStatic("cls");
+            }
+
             string dataStr = "";
             for (int i = 0; i < data.Values.Length; i++)
             {
