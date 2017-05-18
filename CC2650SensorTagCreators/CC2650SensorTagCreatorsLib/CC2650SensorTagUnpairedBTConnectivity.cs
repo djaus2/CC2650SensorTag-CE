@@ -20,6 +20,7 @@ namespace CC2650SenorTagCreators
             public CC2650SensorTagUnpairedBTConnectivity()
             {
                 TagServices = new CC2650SensorTag.TagSensorServices();
+                Logging.Connectivity = this;
             }
 
             long barrier = 0;

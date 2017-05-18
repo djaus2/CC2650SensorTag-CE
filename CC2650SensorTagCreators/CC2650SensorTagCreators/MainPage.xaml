@@ -9,26 +9,44 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition/>
-            <RowDefinition />
-            <RowDefinition/>
-            <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="90*" />
+            <RowDefinition Height="52*"/>
+            <RowDefinition Height="71*" />
+            <RowDefinition Height="71*"/>
+            <RowDefinition Height="71*" />
+            <RowDefinition Height="71*" />
+            <RowDefinition Height="71*"/>
+            <RowDefinition Height="71*" />
+            <RowDefinition Height="71*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="124" />
             <ColumnDefinition Width="*" />
 
         </Grid.ColumnDefinitions>
-        <Button Width="120" Height="60" Content="Start Watcher" Tapped="Button_Tapped" Grid.Column="0" Grid.Row="0"/>
-        <Button Width="120" Height="60" Content="Stop Watcher" Tapped="Button_Tapped_1"  Grid.Column="0" Grid.Row="1"/>
-        <Button Width="120" Height="60" Content="Battery" Tapped="Button_Tapped_5"  Grid.Column="0" Grid.Row="2"/>
-        <Button Width="120" Height="60" Content="Start Logging" Tapped="Button_Tapped_2"  Grid.Column="0" Grid.Row="3"/>
-        <Button Width="120" Height="60" Content="Stop Logging" Tapped="Button_Tapped_3"  Grid.Column="0" Grid.Row="4"/>
-        <Button Width="120" Height="60" Content="Properties" Tapped="Button_Tapped_6"  Grid.Column="0" Grid.Row="5"/>
-
-        <TextBox x:Name="TxtOutput" Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" 
+        <Button Width="120" Height="60" Content="Start Watcher" Tapped="Button_Tapped" Grid.Column="0" Grid.Row="0" Margin="0,19,0,11"/>
+        <Button Width="120" Height="60" Content="Stop Watcher" Tapped="Button_Tapped_1"  Grid.Column="0" Margin="0,84,0,69" Grid.RowSpan="3"/>
+        <Button Width="120" Height="60" Content="Battery" Tapped="Button_Tapped_5"  Grid.Column="0" Grid.Row="2" Margin="0,6,0,5"/>
+        <Button Width="120" Height="60" Content="Start Logging" Tapped="Button_Tapped_2"  Grid.Column="0" Grid.Row="3" Margin="0,6,0,5"/>
+        <Button Width="120" Height="60" Content="Stop Logging" Tapped="Button_Tapped_3"  Grid.Column="0" Grid.Row="4" Margin="0,6,0,5.333"/>
+        <Button Width="120" Height="60" Content="Properties" Tapped="Button_Tapped_6"  Grid.Column="0" Grid.Row="5" Margin="0,5.667,0,5.333"/>
+        <Button Width="120" Height="60" Content="PeriodicValues" Tapped="Button_Tapped_4"  Grid.Column="0" Grid.Row="6" Margin="0,5.667"/>
+        <Button Width="120" Height="60" Content="Stop" Tapped="Button_Tapped_7"  Grid.Column="0" Grid.Row="7" Margin="0,5.333,0,5.667"/>
+        <Button Width="120" Height="60" Content="Manual Read" Tapped="Button_Tapped_8"  Grid.Column="0" Grid.Row="8" Margin="0,5.333,0,6"/>
+        <RelativePanel Grid.Column="1" Grid.Row="0">
+            <TextBlock x:Name="Label1" Text="Period" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4" />
+            <TextBox x:Name="TxtPeriod"  Width="50" Height="30" Text="15"  VerticalAlignment="Center" Margin="4"
+                  RelativePanel.RightOf="Label1" RelativePanel.AlignLeftWith="TxtNumLoops"  RelativePanel.AlignVerticalCenterWith="Label1" />
+            <TextBlock x:Name="Label2" Text="Num Loops" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
+                       RelativePanel.Below="Label1" />
+            <TextBox x:Name="TxtNumLoops"  Width="50" Height="30" Text="5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
+                  RelativePanel.RightOf="Label2"  RelativePanel.AlignVerticalCenterWith="Label2"    />
+            <TextBlock x:Name="Label3" Text="Num Loops" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
+                       RelativePanel.Below="Label2" />
+            <TextBox x:Name="TxtConfig"  Width="50" Height="30" Text="FF" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
+                  RelativePanel.RightOf="Label3"  RelativePanel.AlignVerticalCenterWith="Label3"    />
+        </RelativePanel>
+        <TextBox x:Name="TxtOutput" Grid.Column="1" Grid.Row="1" Grid.RowSpan="8" 
                    TextWrapping="NoWrap"
   AcceptsReturn="True"
   ScrollViewer.VerticalScrollBarVisibility="Visible"

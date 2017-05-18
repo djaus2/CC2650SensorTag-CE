@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -53,12 +54,19 @@ namespace CC2650SenorTagCreators
 
         private async void Button_Tapped_2(object sender, TappedRoutedEventArgs e)
         {
-            await Logging.StartLogging();
+            string strnNumLoops = TxtNumLoops.Text;
+            long numLoops = 4;
+            bool res = long.TryParse(strnNumLoops, out numLoops);
+
+            string strnPeriod = TxtPeriod.Text;
+            long period = 15;
+            res = long.TryParse(strnPeriod, out period);
+            await Logging.StartLogging(numLoops, period);
         }
 
-        private void Button_Tapped_3(object sender, TappedRoutedEventArgs e)
+        private async void Button_Tapped_3(object sender, TappedRoutedEventArgs e)
         {
-            Logging.StopLogging();
+            await Logging.StopLogging();
         }
 
 
@@ -147,6 +155,33 @@ namespace CC2650SenorTagCreators
                         }
                     }
                 }
+        }
+
+        private async void Button_Tapped_4(object sender, TappedRoutedEventArgs e)
+        {
+            string strnNumLoops = TxtNumLoops.Text;
+            long numLoops = 4;
+            bool res = long.TryParse(strnNumLoops, out numLoops);
+
+            string strnPeriod = TxtPeriod.Text;
+            long period = 15;
+            res = long.TryParse(strnPeriod, out period);
+
+            string strnConfig = TxtConfig.Text;
+            byte config = 0xff;
+            res = byte.TryParse(strnConfig, NumberStyles.HexNumber, null as IFormatProvider, out config  );
+
+            await Run.StartRunning(numLoops, period, config);
+        }
+
+        private async void Button_Tapped_7(object sender, TappedRoutedEventArgs e)
+        {
+            await Run.StopRunning();
+        }
+
+        private void Button_Tapped_8(object sender, TappedRoutedEventArgs e)
+        {
+
         }
     }
     

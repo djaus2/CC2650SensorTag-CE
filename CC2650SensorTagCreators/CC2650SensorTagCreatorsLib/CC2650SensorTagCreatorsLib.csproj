@@ -107,6 +107,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CC2650SensorTagCore.cs" />
+    <Compile Include="CC2650SensorTagRun.cs" />
     <Compile Include="CC2650SensorTagLog.cs" />
     <Compile Include="CC2650SensorTagProperties.cs" />
     <Compile Include="CC2650SensorTagSensorEvents.cs" />

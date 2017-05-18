@@ -37,7 +37,7 @@ namespace CC2650SenorTagCreators
                 SensorServices = new SensorServicesCls();
                 SensorEvents = new TagSensorEvents();
                 PropertyServices = new PropertyServiceCls();
-
+                
                 if (Sensors == null)
                     Sensors = new Dictionary<SensorServicesCls.SensorIndexes, SensorChars>();
                 if (PropertyServices == null)

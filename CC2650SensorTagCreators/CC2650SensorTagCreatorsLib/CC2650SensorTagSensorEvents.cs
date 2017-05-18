@@ -11,11 +11,10 @@ using Windows.Storage.Streams;
 
 namespace CC2650SenorTagCreators
 {
-
+    public delegate Task SensorDataDelegate(SensorData data);
     public sealed partial class CC2650SensorTag
     {
-
-
+       
         public class TagSensorEvents
         {
             bool chkIgnoreZeros = true;
@@ -23,8 +22,8 @@ namespace CC2650SenorTagCreators
             bool PeriodicUpdatesOnly = false;
 
             public static bool doCallback = false;
-            public delegate void SensorDataDelegate(SensorData data);
-            public SensorDataDelegate CallMeBack { get; set; } = null;
+            
+            public static SensorDataDelegate CallMeBack { get; set; } = null;
 
             private bool checkArray(SensorServicesCls.SensorIndexes SensorIndex, byte[] bArray)
             {
@@ -99,7 +98,7 @@ namespace CC2650SenorTagCreators
 
 
 
-            public void Notification_ValueChanged(GattCharacteristic sender, GattValueChangedEventArgs eventArgs)
+            public async void Notification_ValueChanged(GattCharacteristic sender, GattValueChangedEventArgs eventArgs)
             {
                 var uuid = sender.Service.Uuid;
                 string st = uuid.ToString();
@@ -206,7 +205,7 @@ namespace CC2650SenorTagCreators
                     //Debug.WriteLine("");
                     if (doCallback)
                         if (CallMeBack != null)
-                            CallMeBack(data);
+                            await CallMeBack(data);
                 }
             }
 

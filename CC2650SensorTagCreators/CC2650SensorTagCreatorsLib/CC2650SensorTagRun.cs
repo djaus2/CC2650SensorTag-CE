@@ -14,7 +14,7 @@ namespace CC2650SenorTagCreators
     /// <summary>
     /// NB: Must be a top level class.
     /// </summary>
-    public static class Logging
+    public static class Run
     {
         public static bool KeepCounting = false;
         public static string LogMsg = "";
@@ -30,57 +30,38 @@ namespace CC2650SenorTagCreators
 
         static private async void EventTimerCallback(object state)
         {
-            PeriodCounter++;
+            //PeriodCounter++;
 
-            //Log battery level
-            byte batteryLevel = 0xff;
-            var res = await Connectivity.TagServices.PropertyServices.GetBatteryLevel();
-            if (res != null)
-                if (res.Length > 0)
-                    batteryLevel = res[0];
-            string strnBatteryLevel = "";
-            if (batteryLevel != 0xff)
-                strnBatteryLevel = "[" + batteryLevel.ToString() + "] ";
+            ////Log battery level
+            //byte batteryLevel = 0xff;
+            //var res = await Connectivity.TagServices.PropertyServices.GetBatteryLevel();
+            //if (res != null)
+            //    if (res.Length > 0)
+            //        batteryLevel = res[0];
+            //string strnBatteryLevel = "";
+            //if (batteryLevel != 0xff)
+            //    strnBatteryLevel = "[" + batteryLevel.ToString() + "] ";
 
-            long currentCount;
-            long diff;
-            if (KeepCounting)
-            {
-                currentCount = System.Threading.Interlocked.Read(ref EventCount);
-                diff = currentCount - LastEventCount;
-                LastEventCount = currentCount;
-            }
-            else
-            {
-                diff = 0;
-                diff = System.Threading.Interlocked.Exchange(ref EventCount, diff);
-            }
+            //long currentCount;
+            //long diff;
+            //if (KeepCounting)
+            //{
+            //    currentCount = System.Threading.Interlocked.Read(ref EventCount);
+            //    diff = currentCount - LastEventCount;
+            //    LastEventCount = currentCount;
+            //}
+            //else
+            //{
+            //    diff = 0;
+            //    diff = System.Threading.Interlocked.Exchange(ref EventCount, diff);
+            //}
 
-            Debug.WriteLine(PeriodCounter);
+            //Debug.WriteLine(PeriodCounter);
 
-            //Write log to UX
-            string logMsg = SensorCntr.ToString() + " " + PeriodCounter.ToString() + " "  + strnBatteryLevel + diff.ToString();
-            await CC2650SensorTag.PrependTextStatic(logMsg);
+            ////Write log to UX
+            //string logMsg = SensorCntr.ToString() + " " + PeriodCounter.ToString() + " " + strnBatteryLevel + diff.ToString();
+            //await CC2650SensorTag.PrependTextStatic(logMsg);
 
-            //Append log to Log
-            LogMsg += logMsg + "\r\n"; ;
-
-            //Write Log every SensorPeriod
-            if ((PeriodCounter % SensorPeriod) == (SensorPeriod - 1))
-            {
-                PeriodCounter = 0;
-
-                StorageFolder storageFolder = KnownFolders.DocumentsLibrary;
-                var sampleFile = await storageFolder.GetFileAsync("sensors.log");
-                await Windows.Storage.FileIO.AppendTextAsync(sampleFile, LogMsg);
-
-                await StopLogging();
-                LogMsg = "";
-
-                await RotateEnableSensors();
-                ContinueLogging();
-
-            }
         }
 
         private static long SensorPeriod = 4; //Switch sensor every 5 minutes.
@@ -92,16 +73,16 @@ namespace CC2650SenorTagCreators
             return ba.Get(bitNumber);
         }
 
-        private static Dictionary<CC2650SensorTag.SensorServicesCls.SensorIndexes, bool> SensorIsOn;
+        private static Dictionary<CC2650SensorTag.SensorServicesCls.SensorIndexes, bool> SensorIsOn = null;
 
 
-        private static async Task RotateEnableSensors()
+        private static async Task EnableDisableSensors()
         {
-           
-            SensorCntr++;
+
+            //sensorCntr++;
             //Skip any cntr which would have IO on.
-            while (GetBit(SensorCntr, (int)CC2650SensorTag.SensorServicesCls.SensorIndexes.IO_SENSOR))
-                SensorCntr++;
+            //while (GetBit(sensorCntr, (int)CC2650SensorTag.SensorServicesCls.SensorIndexes.IO_SENSOR))
+            //    sensorCntr++;
             string listActiveSensors = "";
             for (CC2650SensorTag.SensorServicesCls.SensorIndexes sensor = CC2650SensorTag.SensorServicesCls.SensorIndexes.IR_SENSOR; sensor < (CC2650SensorTag.SensorServicesCls.SensorIndexes.REGISTERS); sensor++)
             {
@@ -145,53 +126,76 @@ namespace CC2650SenorTagCreators
 
             }
 
-            StorageFolder storageFolder = KnownFolders.DocumentsLibrary; ;
-            var sampleFile = await storageFolder.GetFileAsync("sensors.log");
+            //StorageFolder storageFolder = KnownFolders.DocumentsLibrary; ;
+            //var sampleFile = await storageFolder.GetFileAsync("sensors.log");
 
-            string hdr = string.Format("{0}   {1}\r\n", SensorCntr, listActiveSensors);
-            Debug.WriteLine("{0}   {1}\r\n", SensorCntr, hdr);
-            await Windows.Storage.FileIO.AppendTextAsync(sampleFile, hdr);
+            //string hdr = string.Format("{0}   {1}\r\n", sensorCntr, listActiveSensors);
+            //Debug.WriteLine("{0}   {1}\r\n", sensorCntr, hdr);
+            //await Windows.Storage.FileIO.AppendTextAsync(sampleFile, hdr);
 
-            await CC2650SensorTag.PrependTextStatic(hdr);
-            
+            //await CC2650SensorTag.PrependTextStatic(hdr);
+
 
         }
 
-        public static async Task StartLogging(long numLoops, long period)
+        public static async Task StartRunning(long numLoops, long period, byte sensorCntr)
         {
             await CC2650SensorTag.PrependTextStatic("cls");
             LogMsg = "";
-            SensorCntr = 0;
-            SensorIsOn = new Dictionary<CC2650SensorTag.SensorServicesCls.SensorIndexes, bool>();
+            SensorCntr = sensorCntr;
+            if (SensorIsOn == null)
+                SensorIsOn = new Dictionary<CC2650SensorTag.SensorServicesCls.SensorIndexes, bool>();
             PeriodCounter = 0;
             LastEventCount = 0;
 
             SensorPeriod = numLoops;
             UpdatePeriod = 1000 * period;
 
-            StorageFolder storageFolder = KnownFolders.DocumentsLibrary; ;
-            var sampleFile = await storageFolder.CreateFileAsync("sensors.log",
-                    CreationCollisionOption.ReplaceExisting);
-            await RotateEnableSensors();
+            CC2650SensorTag.TagSensorEvents.doCallback = true;
+
+            //StorageFolder storageFolder = KnownFolders.DocumentsLibrary; ;
+            //var sampleFile = await storageFolder.CreateFileAsync("sensors.log",
+            //        CreationCollisionOption.ReplaceExisting);
+            await EnableDisableSensors();
 
             System.Threading.Interlocked.Exchange(ref EventCount, 0);
-            ContinueLogging();
+            ContinueRunning();
         }
 
-        public static void ContinueLogging()
+        public static void ContinueRunning()
         {
             EventTimer = new Timer(EventTimerCallback, null, (int)UpdatePeriod, (int)UpdatePeriod);
         }
 
-        public static async Task StopLogging()
+        public static async Task StopRunning()
         {
             if (EventTimer != null)
                 EventTimer.Dispose();
-
             SensorCntr = 0;
-            await RotateEnableSensors();
+            await EnableDisableSensors();
+            CC2650SensorTag.TagSensorEvents.doCallback = false;
+            CC2650SensorTag.TagSensorEvents.CallMeBack = UpdateSensorDataX;
         }
 
+        
+
+        public async static Task UpdateSensorDataX(SensorData data)
+        {
+            string dataStr = "";
+            for (int i = 0; i < data.Values.Length; i++)
+            {
+                if (i==0)
+                    dataStr = data.Values[i].ToString();
+                else
+                    dataStr += " ," + data.Values[i].ToString();
+            }
+            string fmt;
+            if (data.Sensor_Index != CC2650SensorTag.SensorServicesCls.SensorIndexes.BAROMETRIC_PRESSURE)
+                fmt = string.Format("{0}\t\t\t[ {1} ]", data.Sensor_Index, dataStr);
+            else
+                fmt = string.Format("{0}\t[ {1} ]", data.Sensor_Index, dataStr);
+            await CC2650SensorTag.PrependTextStatic(fmt);
+        }
     }
 }
 
