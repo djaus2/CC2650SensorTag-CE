@@ -5,10 +5,10 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CC2650SenorTagCreators")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("CC2650SensorTagCE")]
+[assembly: AssemblyDescription("CC2650SensorTag Creators Edition: Has Unpaired connectivity.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Sportronics")]
 [assembly: AssemblyProduct("CC2650SenorTagCreators")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]

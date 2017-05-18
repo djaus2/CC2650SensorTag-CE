@@ -14,7 +14,7 @@ namespace CC2650SenorTagCreators
     public delegate Task PassString(string strn);
     public sealed partial class CC2650SensorTag
     {
-        public const long MAX_LINES = 100;  //Output text gets cleared after this number of lines.
+        public const long MAX_LINES = 200;  //Output text gets cleared after this number of lines.
         public static PassString PrependTextStatic { get; set; } = null;
 
         const GattCharacteristicProperties flagNotify = GattCharacteristicProperties.Notify;

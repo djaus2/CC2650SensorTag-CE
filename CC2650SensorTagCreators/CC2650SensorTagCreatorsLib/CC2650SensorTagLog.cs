@@ -74,17 +74,21 @@ namespace CC2650SenorTagCreators
                 var sampleFile = await storageFolder.GetFileAsync("sensors.log");
                 await Windows.Storage.FileIO.AppendTextAsync(sampleFile, LogMsg);
 
-                await StopLogging();
-                LogMsg = "";
+                if (Iterate)
+                {
+                    await StopLogging();
+                    LogMsg = "";
 
-                await RotateEnableSensors();
-                ContinueLogging();
+                    await IterateEnableDisableSensors();
+                    ContinueLogging();
+                }
 
             }
         }
 
         private static long SensorPeriod = 4; //Switch sensor every 5 minutes.
         private static byte SensorCntr = 0;
+        private static bool Iterate = true;
 
         public static bool GetBit(this byte b, int bitNumber)
         {
@@ -95,7 +99,7 @@ namespace CC2650SenorTagCreators
         private static Dictionary<CC2650SensorTag.SensorServicesCls.SensorIndexes, bool> SensorIsOn;
 
 
-        private static async Task RotateEnableSensors()
+        private static async Task IterateEnableDisableSensors()
         {
            
             SensorCntr++;
@@ -157,11 +161,14 @@ namespace CC2650SenorTagCreators
 
         }
 
-        public static async Task StartLogging(long numLoops, long period)
+        public static async Task StartLogging(long numLoops, long period, byte config , bool iterate)
         {
             await CC2650SensorTag.PrependTextStatic("cls");
             LogMsg = "";
-            SensorCntr = 0;
+            SensorCntr = config;
+            if (SensorCntr != 0)
+                SensorCntr--; //It gets incremented when first (and every time) ity is used.
+            Iterate = iterate;
             SensorIsOn = new Dictionary<CC2650SensorTag.SensorServicesCls.SensorIndexes, bool>();
             PeriodCounter = 0;
             LastEventCount = 0;
@@ -172,7 +179,7 @@ namespace CC2650SenorTagCreators
             StorageFolder storageFolder = KnownFolders.DocumentsLibrary; ;
             var sampleFile = await storageFolder.CreateFileAsync("sensors.log",
                     CreationCollisionOption.ReplaceExisting);
-            await RotateEnableSensors();
+            await IterateEnableDisableSensors();
 
             System.Threading.Interlocked.Exchange(ref EventCount, 0);
             ContinueLogging();
@@ -189,7 +196,7 @@ namespace CC2650SenorTagCreators
                 EventTimer.Dispose();
 
             SensorCntr = 0;
-            await RotateEnableSensors();
+            await IterateEnableDisableSensors();
         }
 
     }
