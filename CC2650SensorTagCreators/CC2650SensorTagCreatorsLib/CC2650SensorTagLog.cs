@@ -76,7 +76,7 @@ namespace CC2650SenorTagCreators
 
                 if (Iterate)
                 {
-                    await StopLogging();
+                    PauseLogging();
                     LogMsg = "";
 
                     await IterateEnableDisableSensors();
@@ -187,16 +187,24 @@ namespace CC2650SenorTagCreators
 
         public static void ContinueLogging()
         {
+            //Ignore counts whilst timer is disabled
+            LastEventCount = System.Threading.Interlocked.Read(ref EventCount);
             EventTimer = new Timer(EventTimerCallback, null, (int)UpdatePeriod, (int)UpdatePeriod);
         }
 
         public static async Task StopLogging()
         {
-            if (EventTimer != null)
-                EventTimer.Dispose();
+            PauseLogging();
 
             SensorCntr = 0;
             await IterateEnableDisableSensors();
+            SensorCntr = 0;
+        }
+
+        public static void PauseLogging()
+        {
+            if (EventTimer != null)
+                EventTimer.Dispose();
         }
 
     }
