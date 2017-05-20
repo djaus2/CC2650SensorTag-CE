@@ -1,4 +1,4 @@
-# CC2650SensorTag-CS-Creators
+ # CC2650SensorTag-CS-Creators
 A **C#** **UWP** (Universal Windows Platform) App for the Texas Instruments **CC2650SensorTag** CC2650STK implementing **Unpaired** **BLE**  Bluetooth Low Energy  connectivity as available with **Windows 10 Creators Edition**. ***Targets:*** *IoT-Core, Phone, Desktop*
 
 Preamble
@@ -25,4 +25,4 @@ The most recent update for Windows 10, Creator edition (version 1503), including
 
 When an advertisment is received and is vetted as being a required device, a request to access it can be made (without being paired, with Creators) and if successful can then be interogated for services which can then be interogated for characteristics. Once access is achieved, the app host **IS** connected to the SensorTag. Once a sensor's (read, service's) Notification characteritic instance is obtained, the handler for sensor's value updates is set as a property of the characteristic. Notifications are then turned on and then the sensor's periodic data determination is enabled. The sensor then calls the handler periodically (generally ery second) with a value for the sensor as a byte array. Each enabled sensor in the tag makes it own call.
 
-**This all works, including on the Raspberry Pi 3 (IoT-Core) *WITHOUT* the need for pairing, with the Windows 10 Creators Edition (or later).** *On earlier (but not too early) builds, advertisements should work with paired devices. ?? ToDo(Test)*
+**This all works Windows 10 Creators Edition on Desktop and Phone, as well as on the Raspberry Pi 3 (IoT-Core) and Dragonboard 410c (IoT-Core) *BOTH WITHOUT* the need for pairing.** *On earlier (but not too early) builds, advertisements should work with paired devices. 
