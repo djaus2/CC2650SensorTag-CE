@@ -23,6 +23,12 @@ namespace CC2650SenorTagCreators
                 Logging.Connectivity = this;
             }
 
+            ~CC2650SensorTagUnpairedBTConnectivity()
+            {
+                BLEAdvWatcher = null;
+                TagServices = null;
+            }
+
             long barrier = 0;
 
             public void Start()

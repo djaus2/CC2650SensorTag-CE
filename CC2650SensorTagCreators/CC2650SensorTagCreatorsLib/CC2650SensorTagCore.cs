@@ -44,6 +44,15 @@ namespace CC2650SenorTagCreators
                 if (PropertyServices == null)
                     PropertyServices = new PropertyServiceCls();
             }
+
+            ~TagSensorServices()
+            {
+                PropertyServices = null;
+                SensorEvents = null;
+                SensorServices = null;
+                Sensors = null;
+            }
+
             public async Task InterogateServices(IReadOnlyList<GattDeviceService> svcs)
             {
 

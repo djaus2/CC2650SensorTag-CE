@@ -3,7 +3,7 @@
   <Identity Name="e397fa3f-c901-4e3a-af2b-d2e7347240b2" Publisher="CN=david" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="e397fa3f-c901-4e3a-af2b-d2e7347240b2" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>App1</DisplayName>
+    <DisplayName>CC2650SensorTagCE</DisplayName>
     <PublisherDisplayName>david</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -14,7 +14,7 @@
     <Resource Language="x-generate" />
   </Resources>
   <Applications>
-    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="App1.App">
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="CC2650SensorTagCE.App">
       <uap:VisualElements DisplayName="CC2650SensorTagCE" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="CC2650SensorTag Creators Edition: Has Unpaired connectivity." BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
         </uap:DefaultTile>
@@ -28,6 +28,11 @@
               <uap:FileType>.log</uap:FileType>
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
+        </uap:Extension>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="sensortag">
+            <uap:DisplayName>CC265ensorTagCreators</uap:DisplayName>
+          </uap:Protocol>
         </uap:Extension>
       </Extensions>
     </Application>

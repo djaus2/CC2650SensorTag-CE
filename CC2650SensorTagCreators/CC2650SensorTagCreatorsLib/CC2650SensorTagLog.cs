@@ -68,7 +68,7 @@ namespace CC2650SenorTagCreators
             //Write Log every SensorPeriod
             if ((PeriodCounter % SensorPeriod) == (SensorPeriod - 1))
             {
-                PeriodCounter = 0;
+                
 
                 StorageFolder storageFolder = KnownFolders.DocumentsLibrary;
                 var sampleFile = await storageFolder.GetFileAsync("sensors.log");
@@ -76,6 +76,7 @@ namespace CC2650SenorTagCreators
 
                 if (Iterate)
                 {
+                    PeriodCounter = 0;
                     PauseLogging();
                     LogMsg = "";
 

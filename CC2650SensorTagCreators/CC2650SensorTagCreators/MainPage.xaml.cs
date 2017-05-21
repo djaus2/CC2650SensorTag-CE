@@ -42,19 +42,19 @@ namespace CC2650SenorTagCreators
 
         //public IReadOnlyList<GattCharacteristic> sensorCharacteristicList = null;
     
-        private void Button_Tapped(object sender, TappedRoutedEventArgs e)
+        private void Button_StartWatcher(object sender, TappedRoutedEventArgs e)
         {
             msgCounter = 0;
             Connectivity.Start();
         }
 
-        private void Button_Tapped_1(object sender, TappedRoutedEventArgs e)
+        private void Button_Tapped_StopWatcher(object sender, TappedRoutedEventArgs e)
         {
             msgCounter = 0;
             Connectivity.Stop();
         }
 
-        private async void Button_Tapped_2(object sender, TappedRoutedEventArgs e)
+        private async void Button_Tapped_StartLogging(object sender, TappedRoutedEventArgs e)
         {
             bool iterate = (chkIterateThruAllSensors.IsChecked == true);
             msgCounter = 0;
@@ -73,7 +73,7 @@ namespace CC2650SenorTagCreators
             await Logging.StartLogging(numLoops, period, config, iterate);
         }
 
-        private async void Button_Tapped_3(object sender, TappedRoutedEventArgs e)
+        private async void Button_Tapped_StopLogging(object sender, TappedRoutedEventArgs e)
         {
             msgCounter = 0;
             await Logging.StopLogging();
@@ -112,7 +112,7 @@ namespace CC2650SenorTagCreators
             }
         }
 
-        private async void Button_Tapped_5(object sender, TappedRoutedEventArgs e)
+        private async void Button_Tapped_GetBatteryLevel(object sender, TappedRoutedEventArgs e)
         {
             msgCounter = 0;
             var res = await Connectivity.TagServices.PropertyServices.GetBatteryLevel();
@@ -121,7 +121,7 @@ namespace CC2650SenorTagCreators
                     await PrependTextStatic(string.Format("Battery Level: {0}\r\n", res[0]));
         }
 
-        private async void Button_Tapped_6(object sender, TappedRoutedEventArgs e)
+        private async void Button_Tapped_GetProperties(object sender, TappedRoutedEventArgs e)
         {
             msgCounter = 0;
             var res = await Connectivity.TagServices.PropertyServices.GetProperties(true);
@@ -176,7 +176,7 @@ namespace CC2650SenorTagCreators
                 }
         }
 
-        private async void Button_Tapped_4(object sender, TappedRoutedEventArgs e)
+        private async void Button_Tapped_StartRunning(object sender, TappedRoutedEventArgs e)
         {
             msgCounter = 0;
             string strnNumLoops = TxtNumLoops.Text;
@@ -194,15 +194,16 @@ namespace CC2650SenorTagCreators
             await Run.StartRunning(numLoops, period, config);
         }
 
-        private async void Button_Tapped_7(object sender, TappedRoutedEventArgs e)
+        private async void Button_Tapped_StopRunning(object sender, TappedRoutedEventArgs e)
         {
             msgCounter = 0;
             await Run.StopRunning();
         }
 
-        private void Button_Tapped_8(object sender, TappedRoutedEventArgs e)
+        private void Button_Tapped_Exit(object sender, TappedRoutedEventArgs e)
         {
-            msgCounter = 0;
+            Connectivity = null;
+            App.Current.Exit();
         }
 
         private void chkIterateThruAllSensors_Checked(object sender, RoutedEventArgs e)
@@ -210,10 +211,6 @@ namespace CC2650SenorTagCreators
 
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
     
 }

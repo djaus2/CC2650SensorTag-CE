@@ -24,15 +24,15 @@
             <ColumnDefinition Width="*" />
 
         </Grid.ColumnDefinitions>
-        <Button Width="120" Height="60" Content="Start Watcher" Tapped="Button_Tapped" Grid.Column="0" Grid.Row="0" Margin="0,19,0,11"/>
-        <Button Width="120" Height="60" Content="Stop Watcher" Tapped="Button_Tapped_1"  Grid.Column="0" Margin="0,84,0,69" Grid.RowSpan="3"/>
-        <Button Width="120" Height="60" Content="Battery" Tapped="Button_Tapped_5"  Grid.Column="0" Grid.Row="2" Margin="0,6,0,5"/>
-        <Button Width="120" Height="60" Content="Start Logging" Tapped="Button_Tapped_2"  Grid.Column="0" Grid.Row="3" Margin="0,6,0,5" Click="Button_Click"/>
-        <Button Width="120" Height="60" Content="Stop Logging" Tapped="Button_Tapped_3"  Grid.Column="0" Grid.Row="4" Margin="0,6,0,5.333"/>
-        <Button Width="120" Height="60" Content="Properties" Tapped="Button_Tapped_6"  Grid.Column="0" Grid.Row="5" Margin="0,5.667,0,5.333"/>
-        <Button Width="120" Height="60" Content="Read Sensors" Tapped="Button_Tapped_4"  Grid.Column="0" Grid.Row="6" Margin="0,5.667"/>
-        <Button Width="120" Height="60" Content="Stop Reads" Tapped="Button_Tapped_7"  Grid.Column="0" Grid.Row="7" Margin="0,5.333,0,5.667"/>
-        <Button Width="120" Height="60" Content="" Tapped="Button_Tapped_8"  Grid.Column="0" Grid.Row="8" Margin="0,5.333,0,6"/>
+        <Button Width="120" Height="60" Content="Start Watcher" Tapped="Button_StartWatcher" Grid.Column="0" Grid.Row="0" Margin="0,19,0,11"/>
+        <Button Width="120" Height="60" Content="Stop Watcher" Tapped="Button_Tapped_StopWatcher"  Grid.Column="0" Margin="0,84,0,69" Grid.RowSpan="3"/>
+        <Button Width="120" Height="60" Content="Battery" Tapped="Button_Tapped_GetBatteryLevel"  Grid.Column="0" Grid.Row="2" Margin="0,6,0,5"/>
+        <Button Width="120" Height="60" Content="Start Logging" Tapped="Button_Tapped_StartLogging"  Grid.Column="0" Grid.Row="3" Margin="0,6,0,5"/>
+        <Button Width="120" Height="60" Content="Stop Logging" Tapped="Button_Tapped_StopLogging"  Grid.Column="0" Grid.Row="4" Margin="0,6,0,5.333"/>
+        <Button Width="120" Height="60" Content="Properties" Tapped="Button_Tapped_GetProperties"  Grid.Column="0" Grid.Row="5" Margin="0,5.667,0,5.333"/>
+        <Button Width="120" Height="60" Content="Read Sensors" Tapped="Button_Tapped_StartRunning"  Grid.Column="0" Grid.Row="6" Margin="0,5.667"/>
+        <Button Width="120" Height="60" Content="Stop Reads" Tapped="Button_Tapped_StopRunning"  Grid.Column="0" Grid.Row="7" Margin="0,5.333,0,5.667"/>
+        <Button Width="120" Height="60" Content="Exit" Tapped="Button_Tapped_Exit"  Grid.Column="0" Grid.Row="8" Margin="0,5.333,0,6"/>
         <RelativePanel Grid.Column="1" Grid.Row="0">
             <TextBlock x:Name="Label1" Text="Period" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4" />
             <TextBox x:Name="TxtPeriod"  Width="30" Height="30" Text="15"  VerticalAlignment="Center" Margin="4"
@@ -44,14 +44,14 @@
                        RelativePanel.Below="Label1" />
             <TextBox x:Name="TxtNumLoops"  Width="30" Height="30" Text="5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
                   RelativePanel.RightOf="Label2"  RelativePanel.AlignVerticalCenterWith="Label2"   RelativePanel.AlignLeftWith="TxtConfig"  />
-            <TextBlock x:Name="Labe51" Text="per iter" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
+            <TextBlock x:Name="Labe51" Text="per iteration" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
                         RelativePanel.RightOf="TxtNumLoops"  RelativePanel.AlignVerticalCenterWith="Label2"  />
             
-            <TextBlock x:Name="Label3" Text="Sensor Mask" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
+            <TextBlock x:Name="Label3" Text="Sensors Bit Mask(hex)" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
                        RelativePanel.Below="Label2" />
-            <TextBox x:Name="TxtConfig"  Width="30" Height="30" Text="FF" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
+            <TextBox x:Name="TxtConfig"  Width="30" Height="30" Text="77" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
                   RelativePanel.RightOf="Label3"  RelativePanel.AlignVerticalCenterWith="Label3"    />
-            <CheckBox x:Name="chkIterateThruAllSensors" Content="Iterate" IsChecked="True" 
+            <CheckBox x:Name="chkIterateThruAllSensors" Content="Iterate" IsChecked="False" 
                       RelativePanel.RightOf="TxtConfig" 
                       RelativePanel.AlignVerticalCenterWith="Label3"/>
         </RelativePanel>
