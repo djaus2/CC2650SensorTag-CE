@@ -73,12 +73,13 @@ namespace CC2650SenorTagCreators
                 StorageFolder storageFolder = KnownFolders.DocumentsLibrary;
                 var sampleFile = await storageFolder.GetFileAsync("sensors.log");
                 await Windows.Storage.FileIO.AppendTextAsync(sampleFile, LogMsg);
+                LogMsg = "";
 
                 if (Iterate)
                 {
                     PeriodCounter = 0;
                     PauseLogging();
-                    LogMsg = "";
+                    
 
                     await IterateEnableDisableSensors();
                     ContinueLogging();
