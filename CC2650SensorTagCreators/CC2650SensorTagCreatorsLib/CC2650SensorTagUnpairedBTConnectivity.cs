@@ -83,10 +83,36 @@ namespace CC2650SenorTagCreators
                                 System.Diagnostics.Debug.WriteLine("Endpoint Device Id: {0}", blDevice.DeviceId);
                                 await CC2650SensorTag.PrependTextStatic(string.Format("Endpoint Device Id: {0}", blDevice.DeviceId));
                                 System.Diagnostics.Debug.WriteLine("Start");
+                                string nm = blDevice.Name;
+                                string did = blDevice.DeviceId;
+                                string info = blDevice.DeviceInformation.Name;
+                                if (svcs != null)
+                                {
+                                    int num = svcs.Count;
 
+                                    if (num != 0)
+                                    {
+                                        foreach (var x in svcs)
+                                        {
+                                            string sdf = x.Uuid.ToString();
+                                            string asdcb = x.DeviceId;
+                                            System.Diagnostics.Debug.WriteLine("{0} = {1}", sdf, asdcb);
+                                        }
+                                        await TagServices.InterogateServices(svcs);
 
-                                await TagServices.InterogateServices(svcs);
-                                OK = true;
+                                        OK = true;
+                                    }
+                                    else
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("No Services.");
+                                        OK = false;
+                                    }
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine("ull Services.");
+                                    OK = false;
+                                }
                             }
                         }
                     }

@@ -55,7 +55,11 @@ namespace CC2650SenorTagCreators
 
             public async Task InterogateServices(IReadOnlyList<GattDeviceService> svcs)
             {
-
+                //With event data event an increment is added.
+                //The increment is 100^(sensor)  so each sensor can be counted up to 100 times in each logging interval
+                //ie Max of 1 minute 30 seconds to be safe.
+                //Each sensor then uses 2 digits in this logged value.
+                SensorEvents.GetIncrements();
                 foreach (var gattService in svcs)
                 {
 

@@ -94,7 +94,29 @@ namespace CC2650SenorTagCreators
             }
 
 
+            private long CalculatePower(SensorServicesCls.SensorIndexes sensor)
+            {
+                long Result = 1;
+                int PowerOf = (int)sensor;
+                for (int i = 0; i< PowerOf; i++)
+                {
+                    Result = (Result * 100);
+                }
+                return Result;
+            }
 
+            private Dictionary<SensorServicesCls.SensorIndexes, long> increments = null;
+
+            public void GetIncrements()
+            {
+                increments = new Dictionary<SensorServicesCls.SensorIndexes, long>();
+                for (SensorServicesCls.SensorIndexes sensor = SensorServicesCls.SensorIndexes.IR_SENSOR;
+                    sensor < SensorServicesCls.SensorIndexes.NOTFOUND; sensor++)
+                {
+                    long incr = CalculatePower(sensor);
+                    increments.Add(sensor, incr);
+                }
+            }
 
 
 
@@ -119,44 +141,45 @@ namespace CC2650SenorTagCreators
 
 
                         long nm = 32;
+                        incr = increments[sensor];
 
                         switch (sensor)
                         {
                             case SensorServicesCls.SensorIndexes.REGISTERS:
                                 data = Registers_Handler(sensor, bArray);
-                                incr = 1;
+                                //incr = 1;
                                 break;
                             case SensorServicesCls.SensorIndexes.IR_SENSOR:
-                                data = IR_Sensor_Handler(sensor, bArray);
+                                //data = IR_Sensor_Handler(sensor, bArray);
                                 incr = 100;
                                 break;
                             case SensorServicesCls.SensorIndexes.HUMIDITY:
-                                data = Humidity_Handler(sensor, bArray);
+                                //data = Humidity_Handler(sensor, bArray);
                                 incr = 10000;
                                 break;
                             case SensorServicesCls.SensorIndexes.BAROMETRIC_PRESSURE:
-                                data = Pressure_Handler(sensor, bArray);
+                                //data = Pressure_Handler(sensor, bArray);
                                 incr = 1000000;
                                 break;
                             case SensorServicesCls.SensorIndexes.OPTICAL:
-                                data = Optical_Handler(sensor, bArray);
+                                //data = Optical_Handler(sensor, bArray);
                                 incr = 100000000;
                                 break;
                             case SensorServicesCls.SensorIndexes.IO_SENSOR:
                                 data = IO_Sensor_Handler(sensor, bArray);
-                                incr = 10000000000;
+                                //incr = 10000000000;
                                 break;
                             case SensorServicesCls.SensorIndexes.KEYS:
                                 data = Keys(sensor, bArray);
-                                incr = 1000000000000;
+                                //incr = 1000000000000;
                                 break;
                             case SensorServicesCls.SensorIndexes.MOVEMENT:
                                 data = Movement_Handler(sensor, bArray);
-                                incr = 100000000000000;
+                                //incr = 100000000000000;
                                 break;
                             case SensorServicesCls.SensorIndexes.NOTFOUND:
                                 data = this.NotFound_Handler(sensor, bArray);
-                                incr = 10000000000000000;
+                                //incr = 10000000000000000;
                                 //9223372036854775807
                                 break;
                         }
