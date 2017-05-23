@@ -43,6 +43,8 @@ namespace CC2650SenorTagCreators
                     Sensors = new Dictionary<SensorServicesCls.SensorIndexes, SensorChars>();
                 if (PropertyServices == null)
                     PropertyServices = new PropertyServiceCls();
+
+                SensorEvents.GetIncrements();
             }
 
             ~TagSensorServices()
@@ -59,7 +61,7 @@ namespace CC2650SenorTagCreators
                 //The increment is 100^(sensor)  so each sensor can be counted up to 100 times in each logging interval
                 //ie Max of 1 minute 30 seconds to be safe.
                 //Each sensor then uses 2 digits in this logged value.
-                SensorEvents.GetIncrements();
+                
                 foreach (var gattService in svcs)
                 {
 

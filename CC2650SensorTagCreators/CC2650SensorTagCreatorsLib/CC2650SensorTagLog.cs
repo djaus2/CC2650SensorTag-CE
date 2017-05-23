@@ -25,6 +25,7 @@ namespace CC2650SenorTagCreators
         static long LastEventCount = 0;
         static Timer EventTimer = null;
         public static long EventCount;
+        internal static long AllEventCount;
 
         static long UpdatePeriod = 15000; //15s
 
@@ -56,10 +57,13 @@ namespace CC2650SenorTagCreators
                 diff = System.Threading.Interlocked.Exchange(ref EventCount, diff);
             }
 
+            long AllCounts = System.Threading.Interlocked.Exchange(ref AllEventCount,0);
+
             Debug.WriteLine(PeriodCounter);
 
             //Write log to UX
-            string logMsg = SensorCntr.ToString() + " " + PeriodCounter.ToString() + " "  + strnBatteryLevel + diff.ToString();
+            string logMsg = SensorCntr.ToString() + " " + PeriodCounter.ToString() + " " + strnBatteryLevel
+                + " (" + AllCounts.ToString() +") " +  diff.ToString() ;
             await CC2650SensorTag.PrependTextStatic(logMsg);
 
             //Append log to Log
@@ -165,6 +169,7 @@ namespace CC2650SenorTagCreators
 
         public static async Task StartLogging(long numLoops, long period, byte config , bool iterate)
         {
+            System.Threading.Interlocked.Exchange(ref AllEventCount, 0);
             await CC2650SensorTag.PrependTextStatic("cls");
             LogMsg = "";
             SensorCntr = config;

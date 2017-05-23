@@ -109,6 +109,7 @@ namespace CC2650SenorTagCreators
 
             public void GetIncrements()
             {
+
                 increments = new Dictionary<SensorServicesCls.SensorIndexes, long>();
                 for (SensorServicesCls.SensorIndexes sensor = SensorServicesCls.SensorIndexes.IR_SENSOR;
                     sensor < SensorServicesCls.SensorIndexes.NOTFOUND; sensor++)
@@ -117,7 +118,6 @@ namespace CC2650SenorTagCreators
                     increments.Add(sensor, incr);
                 }
             }
-
 
 
             public async void Notification_ValueChanged(GattCharacteristic sender, GattValueChangedEventArgs eventArgs)
@@ -151,19 +151,19 @@ namespace CC2650SenorTagCreators
                                 break;
                             case SensorServicesCls.SensorIndexes.IR_SENSOR:
                                 //data = IR_Sensor_Handler(sensor, bArray);
-                                incr = 100;
+                                //incr = 100;
                                 break;
                             case SensorServicesCls.SensorIndexes.HUMIDITY:
                                 //data = Humidity_Handler(sensor, bArray);
-                                incr = 10000;
+                                //incr = 10000;
                                 break;
                             case SensorServicesCls.SensorIndexes.BAROMETRIC_PRESSURE:
                                 //data = Pressure_Handler(sensor, bArray);
-                                incr = 1000000;
+                                //incr = 1000000;
                                 break;
                             case SensorServicesCls.SensorIndexes.OPTICAL:
                                 //data = Optical_Handler(sensor, bArray);
-                                incr = 100000000;
+                                //incr = 100000000;
                                 break;
                             case SensorServicesCls.SensorIndexes.IO_SENSOR:
                                 data = IO_Sensor_Handler(sensor, bArray);
@@ -214,9 +214,9 @@ namespace CC2650SenorTagCreators
                     //}
                 }
                 long res;
-                if (Logging.KeepCounting)
-                    res = System.Threading.Interlocked.Increment(ref Logging.EventCount);
-                else
+                
+                res = System.Threading.Interlocked.Increment(ref Logging.AllEventCount);
+                if (!Logging.KeepCounting)
                     res = System.Threading.Interlocked.Add(ref Logging.EventCount, incr);
 
                 if (data != null)
