@@ -1,7 +1,7 @@
 # CC2650SensorTag-CS-Creators
 A **C#** **UWP** (Universal Windows Platform) App for the Texas Instruments **CC2650SensorTag** CC2650STK implementing **Unpaired** **BLE**  Bluetooth Low Energy  connectivity as available with **Windows 10 Creators Edition**. ***Targets:*** *IoT-Core, Phone, Desktop*
 
-See [Issue 1](|https://github.com/djaus2/CC2650SensorTag-CE/issues/1) for an image of the app running.
+See ["The running app" Issue](https://github.com/djaus2/CC2650SensorTag-CE/issues/1) for an image of the app running.
 
 BUG FIX: Now reads all sensors. 
 ===============================
