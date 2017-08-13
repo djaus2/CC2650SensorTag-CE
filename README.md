@@ -5,19 +5,19 @@ BUG FIX: Now reads all sensors.
 ===============================
 
 Can set sensors to read through bit mask or iterate through all in bitmask(see Iterate chackbox).
-Note can iterate through all sensors or just set via bitmask which to read:
-           public enum SensorIndexes
-            {
-                IR_SENSOR,  =1h
-                HUMIDITY,  =2h
-                BAROMETRIC_PRESSURE, =4h
-                IO_SENSOR,   Is output
-                KEYS,  =10h
-                OPTICAL, =20h
-                MOVEMENT, 40h
-                REGISTERS,
-                NOTFOUND
-            }
+
+    public enum SensorIndexes            
+    {                
+        IR_SENSOR,  =1h              
+        HUMIDITY,  =2h                
+        BAROMETRIC_PRESSURE, =4h                
+        IO_SENSOR,   Is output               
+        KEYS,  =10h               
+        OPTICAL, =20h                
+        MOVEMENT, 40h               
+        REGISTERS,              
+        NOTFOUND            
+    }
 
 So 77h is bit mask for all.
 1 would just be IR_SENSOR etc.
