@@ -150,19 +150,19 @@ namespace CC2650SenorTagCreators
                                 //incr = 1;
                                 break;
                             case SensorServicesCls.SensorIndexes.IR_SENSOR:
-                                //data = IR_Sensor_Handler(sensor, bArray);
+                                data = IR_Sensor_Handler(sensor, bArray);
                                 //incr = 100;
                                 break;
                             case SensorServicesCls.SensorIndexes.HUMIDITY:
-                                //data = Humidity_Handler(sensor, bArray);
+                                data = Humidity_Handler(sensor, bArray);
                                 //incr = 10000;
                                 break;
                             case SensorServicesCls.SensorIndexes.BAROMETRIC_PRESSURE:
-                                //data = Pressure_Handler(sensor, bArray);
+                                data = Pressure_Handler(sensor, bArray);
                                 //incr = 1000000;
                                 break;
                             case SensorServicesCls.SensorIndexes.OPTICAL:
-                                //data = Optical_Handler(sensor, bArray);
+                                data = Optical_Handler(sensor, bArray);
                                 //incr = 100000000;
                                 break;
                             case SensorServicesCls.SensorIndexes.IO_SENSOR:
