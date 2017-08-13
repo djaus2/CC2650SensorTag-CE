@@ -4,7 +4,8 @@ A **C#** **UWP** (Universal Windows Platform) App for the Texas Instruments **CC
 BUG FIX: Now reads all sensors. 
 ===============================
 
-Can set sensors to read through bit mask or iterate through all in bitmask(see Iterate chackbox).
+Can set sensors to read via update, through a bit mask.
+Or can iterately read all in bitmask(see Iterate chackbox).
 
     public enum SensorIndexes            
     {                
