@@ -164,38 +164,40 @@ namespace CC2650SenorTagCreators
                         }
 
                         if (sensor != SensorServicesCls.SensorIndexes.NOTFOUND)
-                        {
-                            switch (charType)
+                            if(sensorCharacteristics.Charcteristics.Keys.Contains(charType))
                             {
-                                case SensorServicesCls.CharacteristicTypes.Notify:
-                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Notify, characteristic);
-                                    break;
-                                case SensorServicesCls.CharacteristicTypes.Enable:
-                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Enable, characteristic);
-                                    break;
-                                case SensorServicesCls.CharacteristicTypes.Period:
-                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Period, characteristic);
-                                    break;
-                                case SensorServicesCls.CharacteristicTypes.Data:
-                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Data, characteristic);
-                                    break;
-                                case SensorServicesCls.CharacteristicTypes.Configuration:
-                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Configuration, characteristic);
-                                    break;
-                                case SensorServicesCls.CharacteristicTypes.Registers_Address:
-                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Registers_Address, characteristic);
-                                    break;
-                                case SensorServicesCls.CharacteristicTypes.Registers_Device_Id:
-                                    sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Registers_Device_Id, characteristic);
-                                    break;
-                                case SensorServicesCls.CharacteristicTypes.NOTFOUND:
-                                    break;
-                            }
+                                switch (charType)
+                                {
+                                    case SensorServicesCls.CharacteristicTypes.Notify:
+                                        sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Notify, characteristic);
+                                        break;
+                                    case SensorServicesCls.CharacteristicTypes.Enable:
+                                        sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Enable, characteristic);
+                                        break;
+                                    case SensorServicesCls.CharacteristicTypes.Period:
+                                        sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Period, characteristic);
+                                        break;
+                                    case SensorServicesCls.CharacteristicTypes.Data:
+                                        sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Data, characteristic);
+                                        break;
+                                    case SensorServicesCls.CharacteristicTypes.Configuration:
+                                        sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Configuration, characteristic);
+                                        break;
+                                    case SensorServicesCls.CharacteristicTypes.Registers_Address:
+                                        sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Registers_Address, characteristic);
+                                        break;
+                                    case SensorServicesCls.CharacteristicTypes.Registers_Device_Id:
+                                        sensorCharacteristics.Charcteristics.Add(CC2650SensorTag.SensorServicesCls.CharacteristicTypes.Registers_Device_Id, characteristic);
+                                        break;
+                                    case SensorServicesCls.CharacteristicTypes.NOTFOUND:
+                                        break;
+                                }
                         }
                         else
                         {
                             if (property != PropertyServiceCls.SensorTagProperties.NOTFOUND)
                             {
+                                if(sensorCharacteristics.CharcteristicsP.Keys.Contains(charPType))
                                 sensorCharacteristics.CharcteristicsP.Add(charPType, characteristic);
                             }
                         }
@@ -203,9 +205,11 @@ namespace CC2650SenorTagCreators
                     }
 
                     if (sensor != SensorServicesCls.SensorIndexes.NOTFOUND)
+                        if (!Sensors.Keys.Contains(sensor))
                         Sensors.Add(sensor, sensorCharacteristics);
                     else if (property != PropertyServiceCls.SensorTagProperties.NOTFOUND)
-                        PropertyServices.Properties.Add(property, sensorCharacteristics);
+                        if (!PropertyServices.Properties.Keys.Contains(property))
+                            PropertyServices.Properties.Add(property, sensorCharacteristics);
 
                 }
 
