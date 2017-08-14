@@ -37,6 +37,8 @@ namespace CC2650SenorTagCreators
 
             public const string GENERIC_SERVICE =           "00001800-0000-1000-8000-00805f9b34fb";
             public const string GENERIC_APPEARANCE =        "00002A01-0000-1000-8000-00805f9b34fb";
+            public const string GENERIC_peripheral_privacy_flag =     "00002A02-0000-1000-8000-00805f9b34fb";
+            public const string GENERIC_reconnection_address =        "00002A03-0000-1000-8000-00805f9b34fb";
             public const string GENERIC_PPCP =              "00002A04-0000-1000-8000-00805f9b34fb";
 
             public const string ATTRIBUTE_SERVICE =         "00001801-0000-1000-8000-00805f9b34fb";
@@ -61,7 +63,11 @@ namespace CC2650SenorTagCreators
             {
             { SensorTagProperties.GenericService , GENERIC_SERVICE },
             { SensorTagProperties.Appearance , GENERIC_APPEARANCE },
+            { SensorTagProperties.PeripheralPrivacyFlag , GENERIC_peripheral_privacy_flag },
+            { SensorTagProperties.ReconnectionAddress , GENERIC_reconnection_address },
+
             { SensorTagProperties.PeripheralPreferredConnectionParameters , GENERIC_PPCP },
+
 
             { SensorTagProperties.AttributeService , ATTRIBUTE_SERVICE },
 
@@ -97,10 +103,13 @@ namespace CC2650SenorTagCreators
             public enum SensorTagProperties
             {
                 GenericService, Appearance, PeripheralPreferredConnectionParameters,
+                PeripheralPrivacyFlag,
+                ReconnectionAddress,
                 AttributeService,
                 PropertiesService, SysId, DeviceName, ModelName, SerialNumber, FirmwareDate,
                 HardwareRevision, SoftwareRevision, ManufacturerId, BTSigCertification, PNPId,
-                BatteryService, BatteryLevel, NOTFOUND
+                BatteryService, BatteryLevel, NOTFOUND,
+
             };
 
             /// <summary>
