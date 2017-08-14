@@ -164,7 +164,8 @@ namespace CC2650SenorTagCreators
                         }
 
                         if (sensor != SensorServicesCls.SensorIndexes.NOTFOUND)
-                            if(sensorCharacteristics.Charcteristics.Keys.Contains(charType))
+                        {
+                            if (!sensorCharacteristics.Charcteristics.Keys.Contains(charType))
                             {
                                 switch (charType)
                                 {
@@ -192,24 +193,29 @@ namespace CC2650SenorTagCreators
                                     case SensorServicesCls.CharacteristicTypes.NOTFOUND:
                                         break;
                                 }
+                            }
                         }
                         else
                         {
                             if (property != PropertyServiceCls.SensorTagProperties.NOTFOUND)
                             {
-                                if(sensorCharacteristics.CharcteristicsP.Keys.Contains(charPType))
-                                sensorCharacteristics.CharcteristicsP.Add(charPType, characteristic);
+                                if(!sensorCharacteristics.CharcteristicsP.Keys.Contains(charPType))
+                                    sensorCharacteristics.CharcteristicsP.Add(charPType, characteristic);
                             }
                         }
 
                     }
 
                     if (sensor != SensorServicesCls.SensorIndexes.NOTFOUND)
+                    {
                         if (!Sensors.Keys.Contains(sensor))
-                        Sensors.Add(sensor, sensorCharacteristics);
+                            Sensors.Add(sensor, sensorCharacteristics);
+                    }
                     else if (property != PropertyServiceCls.SensorTagProperties.NOTFOUND)
+                    {
                         if (!PropertyServices.Properties.Keys.Contains(property))
                             PropertyServices.Properties.Add(property, sensorCharacteristics);
+                    }
 
                 }
 
