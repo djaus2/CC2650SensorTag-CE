@@ -1,31 +1,17 @@
 # CC2650SensorTag-CS-Creators
 A **C#** **UWP** (Universal Windows Platform) App for the Texas Instruments **CC2650SensorTag** CC2650STK implementing **Unpaired** **BLE**  Bluetooth Low Energy  connectivity as available with **Windows 10 Creators Edition**. ***Targets:*** *IoT-Core, Phone, Desktop*
 
-See ["The running app" Issue](https://github.com/djaus2/CC2650SensorTag-CE/issues/1) for an image of the app running.
+See ["The running app" Issue](https://github.com/djaus2/CC2650SensorTag-CE/issues/1) for an image of the app running. Also see other images under Issues.
+
+Wiki now includes a HowTo Log and Ho\wTo Read SensorTag values with the  app.
+
+Bug Fix:
+==============================
+Can now run reliably on on RPI3. See my blog (coming)
 
 BUG FIX: Now reads all sensors. 
 ===============================
-
-Can set sensors to read via update, through a bit mask.
-Or can iterately read all in bitmask(see Iterate chackbox).
-
-    public enum SensorIndexes            
-    {                
-        IR_SENSOR,  =1h              
-        HUMIDITY,  =2h                
-        BAROMETRIC_PRESSURE, =4h                
-        IO_SENSOR,   Is output               
-        KEYS,  =10h               
-        OPTICAL, =20h                
-        MOVEMENT, =40h               
-        REGISTERS,              
-        NOTFOUND            
-    }
-
-So 77h is bit mask for all.
-1 would just be IR_SENSOR etc.
-
-
+See the Wiki.
 
 Preamble
 ========
