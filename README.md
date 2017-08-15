@@ -7,7 +7,7 @@ A **C#** **UWP** (Universal Windows Platform) App for the Texas Instruments **CC
 
 Bug Fix 2:
 ==============================
-Can now run reliably on on RPI3. See my blog (coming)
+Can now run reliably on on RPI3. See my blog (coming). **RPI3 has run for over 15 hours without missing a beat!**
 
 Bug Fix 1: Now reads all sensors. 
 ===============================
