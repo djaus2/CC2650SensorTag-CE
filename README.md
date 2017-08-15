@@ -5,11 +5,11 @@ See ["The running app" Issue](https://github.com/djaus2/CC2650SensorTag-CE/issue
 
 Wiki now includes a HowTo Log and Ho\wTo Read SensorTag values with the  app.
 
-Bug Fix:
+Bug Fix 2:
 ==============================
 Can now run reliably on on RPI3. See my blog (coming)
 
-BUG FIX: Now reads all sensors. 
+Bug Fix 1: Now reads all sensors. 
 ===============================
 See the Wiki.
 
