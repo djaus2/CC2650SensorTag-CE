@@ -56,6 +56,7 @@ namespace CC2650SenorTagCreators
 
         private async void Button_Tapped_StartLogging(object sender, TappedRoutedEventArgs e)
         {
+            await PrependTextStatic("cls");
             bool iterate = (chkIterateThruAllSensors.IsChecked == true);
             msgCounter = 0;
             string strnNumLoops = TxtNumLoops.Text;
@@ -114,6 +115,7 @@ namespace CC2650SenorTagCreators
 
         private async void Button_Tapped_GetBatteryLevel(object sender, TappedRoutedEventArgs e)
         {
+            await PrependTextStatic("cls");
             msgCounter = 0;
             var res = await Connectivity.TagServices.PropertyServices.GetBatteryLevel();
             if (res != null)
@@ -178,6 +180,7 @@ namespace CC2650SenorTagCreators
 
         private async void Button_Tapped_StartRunning(object sender, TappedRoutedEventArgs e)
         {
+            await PrependTextStatic("cls");
             msgCounter = 0;
             string strnNumLoops = TxtNumLoops.Text;
             long numLoops = 4;
