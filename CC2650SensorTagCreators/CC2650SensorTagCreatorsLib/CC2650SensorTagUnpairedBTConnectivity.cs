@@ -15,6 +15,9 @@ namespace CC2650SenorTagCreators
         {
             BluetoothLEAdvertisementWatcher BLEAdvWatcher;
 
+            public  string NameFilter { get;  set; } = "SensorTag";
+
+
             public CC2650SensorTag.TagSensorServices TagServices { get; internal set; } = null;
 
             public CC2650SensorTagUnpairedBTConnectivity()
@@ -30,6 +33,7 @@ namespace CC2650SenorTagCreators
             }
 
             long barrier = 0;
+    
 
             public void Start()
             {
@@ -53,14 +57,33 @@ namespace CC2650SenorTagCreators
                     BLEAdvWatcher.Stop();
                     Guid guidNotification;
                     ulong blAdress = args.BluetoothAddress; ;
+
                     BluetoothLEDevice blDevice = await
                         Windows.Devices.Bluetooth.BluetoothLEDevice.FromBluetoothAddressAsync(blAdress);
                     if (!(blDevice == null))
                     {
                         var name = blDevice.Name;
-                        if (blDevice.DeviceInformation.Kind ==
-                                Windows.Devices.Enumeration.DeviceInformationKind.AssociationEndpoint)
+                        System.Diagnostics.Debug.WriteLine("Device Name=:", name);
+                        if ((blDevice.DeviceInformation.Kind ==
+                                Windows.Devices.Enumeration.DeviceInformationKind.AssociationEndpoint) &&
+                                (NameFilter==""?true:name.ToLower().Contains(NameFilter.ToLower())))
                         {
+                            System.Diagnostics.Debug.WriteLine("Bluetooth Address: {0}", blAdress);
+                            await CC2650SensorTag.PrependTextStatic(string.Format("Bluetooth Address: {0}", blAdress));
+
+
+                            byte[]
+                            bytes = BitConverter.GetBytes(blAdress);
+                            string res = System.Text.Encoding.UTF8.GetString(bytes);
+
+                            string addrStr = bytes[bytes.Length-3].ToString("X2");
+                            for (int i = bytes.Length - 4;  i >-1; i--)
+                            {
+                                addrStr += ":" + bytes[i].ToString("X2");
+                            }
+
+                            System.Diagnostics.Debug.WriteLine("Bluetooth Address: {0}", addrStr);
+                            await CC2650SensorTag.PrependTextStatic(string.Format("Bluetooth Address: {0}", addrStr));
 
                             var scanresp = args.AdvertisementType;
                             Windows.Devices.Enumeration.DeviceAccessStatus result;

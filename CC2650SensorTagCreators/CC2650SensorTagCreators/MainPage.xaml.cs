@@ -46,6 +46,7 @@ namespace CC2650SenorTagCreators
         {
             msgCounter = 0;
             Connectivity.Start();
+            Connectivity.NameFilter = NameFilter.Text;
         }
 
         private void Button_Tapped_StopWatcher(object sender, TappedRoutedEventArgs e)

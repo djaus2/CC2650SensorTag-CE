@@ -46,7 +46,7 @@
                   RelativePanel.RightOf="Label2"  RelativePanel.AlignVerticalCenterWith="Label2"   RelativePanel.AlignLeftWith="TxtConfig"  />
             <TextBlock x:Name="Labe51" Text="per iteration" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
                         RelativePanel.RightOf="TxtNumLoops"  RelativePanel.AlignVerticalCenterWith="Label2"  />
-            
+
             <TextBlock x:Name="Label3" Text="Sensors Bit Mask(hex)" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
                        RelativePanel.Below="Label2" />
             <TextBox x:Name="TxtConfig"  Width="30" Height="30" Text="77" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4"
@@ -54,6 +54,11 @@
             <CheckBox x:Name="chkIterateThruAllSensors" Content="Iterate" IsChecked="False" 
                       RelativePanel.RightOf="TxtConfig" 
                       RelativePanel.AlignVerticalCenterWith="Label3"/>
+            <TextBlock x:Name="Label45" Text="Name Filter:" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,5,10,0"  
+                       RelativePanel.RightOf="Labe41" />
+            <TextBox x:Name="NameFilter" Height="30" Text="" VerticalAlignment="Center"  Margin="50,0,-352.5,0"
+                     RelativePanel.AlignLeftWith="Label45"
+                  RelativePanel.Below="Label45"   PlaceholderText="Enter Device Name Filter, eg SensorTag"    />
         </RelativePanel>
         <TextBox x:Name="TxtOutput" Grid.Column="1" Grid.Row="1" Grid.RowSpan="8" 
                    TextWrapping="NoWrap"
